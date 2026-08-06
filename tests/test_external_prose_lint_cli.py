@@ -177,3 +177,12 @@ def test_banned_word_longest_match_and_list() -> None:
     joined = " ".join(h.text for h in by_id["banned_word"].hits)
     assert "值得关注" in joined
     assert "[值得]" in joined
+
+
+def test_polarity_catches_wubi() -> None:
+    text = "信号已经无比明确，需要进一步验证。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["polarity"].count >= 1
+    assert any("无比" in h.text for h in by_id["polarity"].hits)
+
