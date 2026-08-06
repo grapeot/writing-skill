@@ -27,7 +27,7 @@ class CheckResult:
         if self.id == "char_count":
             return False  # informational only
         if self.id == "h2_count":
-            return self.count == 0 or self.count > 8 or self.count < 3
+            return self.count == 0 or self.count > 4
         if self.id == "embedded_links":
             return self.count < 3  # External-facing prose expects at least 3 embedded links for source verification
         if self.id == "single_sentence_paragraph":

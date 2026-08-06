@@ -157,6 +157,15 @@ def test_h2_finding_when_zero() -> None:
     assert by_id["h2_count"].has_finding
 
 
+def test_h2_finding_when_greater_than_four() -> None:
+    text = "# 标题\n\n" + "".join(f"## Section {i}\n\n段落内容第一句。段落内容第二句。\n\n" for i in range(1, 6))
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["h2_count"].count == 5
+    assert by_id["h2_count"].has_finding
+
+
+
 def test_banned_word_longest_match_and_list() -> None:
     assert "长出来" in cli.BANNED_WORDS
     assert "结构性" in cli.BANNED_WORDS
