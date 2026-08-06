@@ -24,14 +24,14 @@
 在 workspace 根目录，激活 `.venv` 后：
 
 ```bash
-python -m rules.skills.external_prose_lint_cli path/to/article.md
-python -m rules.skills.external_prose_lint_cli path/to/article.md --json
-python -m rules.skills.external_prose_lint_cli path/to/article.md --fail-on hard   # 默认
-python -m rules.skills.external_prose_lint_cli path/to/article.md --fail-on any
-python -m rules.skills.external_prose_lint_cli path/to/article.md --fail-on never
+python -m writing_skill.external_prose_lint_cli path/to/article.md
+python -m writing_skill.external_prose_lint_cli path/to/article.md --json
+python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on hard   # 默认
+python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on any
+python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on never
 ```
 
-（若 workspace 使用 `.venv`，把 `python` 换成 `.venv/bin/python`。）
+安装后即可运行（`uv pip install -e .`）。
 
 退出码：`0` 无 hard finding（默认）；`1` 有 hard finding；`2` 文件错误。
 
@@ -67,11 +67,11 @@ python -m rules.skills.external_prose_lint_cli path/to/article.md --fail-on neve
 ## 测试
 
 ```bash
-python -m pytest rules/skills/tests/test_external_prose_lint_cli.py -q
+python -m pytest tests/test_external_prose_lint_cli.py -q
 ```
 
 ## 实现
 
-- CLI：`rules/skills/external_prose_lint_cli.py`
-- 测试：`rules/skills/tests/test_external_prose_lint_cli.py`
-- 工作流接入：`rules/skills/workflow_external_writing.md` §7 / §9
+- CLI：`src/writing_skill/external_prose_lint_cli.py`
+- 测试：`tests/test_external_prose_lint_cli.py`
+- 工作流接入：`skills/workflow_external_writing.md` §7 / §9
