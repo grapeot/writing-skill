@@ -37,7 +37,7 @@ CLEAN = """# 测试标题
 
 备份不是把文件复制一份就结束。真正要验证的是：灾难发生时，你能不能在约定时间内把业务恢复到可工作状态。
 
-我原先以为每天 rsync 到另一块盘就够了。后来有一次盘阵固件故障，两份拷贝一起读不出来，才发现拷贝份数解决不了同一故障域的问题。
+我原先以为每天 rsync 到另一块盘就够了。参考 [官方灾备指南](https://example.com/guide) 与 [实测事故分析](https://example.com/incident)。后来有一次盘阵固件故障，两份拷贝一起读不出来，才发现拷贝份数解决不了同一故障域的问题。
 
 ## 为什么多份拷贝仍可能同时失效
 
@@ -69,7 +69,8 @@ def test_scan_dirty_finds_hard_signals() -> None:
     assert by_id["title_book_marks"].count >= 1
     assert by_id["quotes"].count >= 1
     assert by_id["single_sentence_paragraph"].count >= 1
-    assert by_id["embedded_links"].count >= 1
+    assert by_id["embedded_links"].count == 1
+    assert by_id["embedded_links"].has_finding  # < 3 triggers review finding
     assert by_id["bei_passive"].count >= 1
     assert report.hard_finding_count >= 1
 
@@ -78,14 +79,28 @@ def test_scan_clean_has_no_hard_findings() -> None:
     report = cli.scan_text(CLEAN, path="clean.md")
     hard = [c for c in report.checks if c.has_finding and c.hard]
     assert hard == [], [c.id for c in hard]
-    assert report.stats["md_links"] >= 1
+    assert report.stats["md_links"] == 3
+    assert not report.checks[CHECK_ORDER_INDEX("embedded_links", report.checks)].has_finding
     assert report.stats["cjk_chars"] > 100
     assert report.stats["h2"] == 2
 
 
+def CHECK_ORDER_INDEX(check_id: str, checks: list[cli.CheckResult]) -> int:
+    for idx, c in enumerate(checks):
+        if c.id == check_id:
+            return idx
+    raise KeyError(check_id)
+
+
+def test_embedded_links_finding_when_under_three() -> None:
+    text = "# 标题\n\n正文只有一个 [链接](https://example.com)。\n\n## 第一节\n\n正常正文段落。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["embedded_links"].count == 1
+    assert by_id["embedded_links"].has_finding
+
+
 def test_bracket_gloss_skips_year_parens() -> None:
-    text = "这件事发生在2024（补充说明不是英文）之前。\n\n真正的问题是蒸馏（Distillation）不该出现。\n"
-    # first has Chinese in parens after digits mixed - our pattern needs Latin in parens after CJK
     text = "活动在夏季举行（2024）。\n\n可观测能力（observability）不该出现。\n"
     report = cli.scan_text(text)
     by_id = {c.id: c for c in report.checks}
@@ -146,7 +161,6 @@ def test_banned_word_longest_match_and_list() -> None:
     assert "长出来" in cli.BANNED_WORDS
     assert "结构性" in cli.BANNED_WORDS
     assert "值得关注" in cli.BANNED_WORDS
-    # longest form preferred over bare 值得
     text = "这一点值得关注，也值得再想。\n"
     report = cli.scan_text(text)
     by_id = {c.id: c for c in report.checks}
