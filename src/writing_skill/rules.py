@@ -142,9 +142,9 @@ RULES: dict[str, str] = {
         "→ 下列裸 URL 能否改成带锚文本的 Markdown 链接？"
     ),
     "h2_count": (
-        "workflow_external_writing：writing_brief 规划 4–6 个清晰 `## H2`；"
-        "正文应有可扫读的分节，而不是一整坨或碎片小标题。\n"
-        "→ 当前 H2 数量是否与文章长度/结构匹配？过少是否缺分节，过多是否切太碎？"
+        "workflow_external_writing：正文的 H2 章节数量建议最多 4 个；"
+        "如果 H2 章节超过 4 个，内容容易切得太碎，请合理合并或精简章节。\n"
+        "→ 当前 H2 数量是否超过 4 个？如超过请做合并。"
     ),
     "title_book_marks": (
         "用户纠正：标题不要用书名号《》。\n"

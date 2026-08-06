@@ -359,7 +359,7 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
             hits=[Hit(adj_line(_line_of(body, m.start())), m.group(1).strip()[:72]) for m in h2s[:20]],
             hard=False,
             rule=RULES["h2_count"],
-            note="建议长文约 4–6 个 H2；0 或 >8 会标为待审。",
+            note="建议最多 4 个 H2 章节；超过 4 个或为 0 时标为待审警告。",
         )
     )
 
