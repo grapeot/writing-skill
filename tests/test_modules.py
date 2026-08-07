@@ -12,8 +12,8 @@ from writing_skill.scanner import scan_path, scan_text
 def test_models_report_finding_counts() -> None:
     hit = Hit(line=5, text="sample hit")
     c1 = CheckResult(id="em_dash", count=1, hits=[hit], hard=True, rule=RULES["em_dash"])
-    c2 = CheckResult(id="char_count", count=500, hits=[], hard=False, rule=RULES["char_count"])
-    report = Report(path="test.md", stats={"cjk_chars": 500}, checks=[c1, c2])
+    c2 = CheckResult(id="char_count", count=2500, hits=[], hard=False, rule=RULES["char_count"])
+    report = Report(path="test.md", stats={"cjk_chars": 2500}, checks=[c1, c2])
 
     assert report.finding_count == 1
     assert report.hard_finding_count == 1
@@ -29,7 +29,7 @@ def test_scanner_and_formatter_integration(tmp_path: Path) -> None:
     assert report.stats["cjk_chars"] > 40
     assert report.stats["md_links"] == 3
     assert report.stats["h2"] == 4
-    assert report.finding_count == 0
+    assert report.finding_count == 1  # 1 finding for char_count < 2000
 
     json_str = format_json(report)
     parsed = json.loads(json_str)

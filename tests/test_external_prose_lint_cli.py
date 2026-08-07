@@ -186,3 +186,12 @@ def test_polarity_catches_wubi() -> None:
     assert by_id["polarity"].count >= 1
     assert any("无比" in h.text for h in by_id["polarity"].hits)
 
+
+def test_char_count_finding_when_under_2000() -> None:
+    text = "# 标题\n\n短篇内容。"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["char_count"].has_finding
+    assert "低于 2000 字" in by_id["char_count"].note
+
+
