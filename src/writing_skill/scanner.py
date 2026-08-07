@@ -402,7 +402,7 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
             hits=[],
             hard=False,
             rule=RULES["char_count"],
-            note="汉字字数（不含标点/英文）。",
+            note="汉字字数低于 2000 字阈值，需确认用户明确许可或补足至 2500 字以上。" if cjk_count < 2000 else f"汉字字数达标 ({cjk_count} 字)",
         )
     )
 

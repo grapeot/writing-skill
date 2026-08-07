@@ -25,7 +25,7 @@ class CheckResult:
     @property
     def has_finding(self) -> bool:
         if self.id == "char_count":
-            return False  # informational only
+            return self.count < 2000  # External analysis articles expect >= 2000 CJK chars; warning if < 2000
         if self.id == "h2_count":
             return self.count == 0 or self.count > 4
         if self.id == "embedded_links":
