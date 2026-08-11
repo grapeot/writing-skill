@@ -12,6 +12,7 @@ CHECK_ORDER = [
     "polarity",
     "meta_preamble",
     "not_x_but_y",
+    "when_clause",
     "banned_word",
     "single_sentence_paragraph",
     "embedded_links",
@@ -29,6 +30,7 @@ HARD_ZERO_CHECKS = {
     "polarity",
     "meta_preamble",
     "not_x_but_y",
+    "when_clause",
     "banned_word",
     "title_book_marks",
     "bare_url",
@@ -117,6 +119,11 @@ RULES: dict[str, str] = {
         "它常制造假对立与翻译腔。\n"
         "→ 下列是否可改成直接陈述事实/取舍，而不走「不是…而是…」句式？"
     ),
+    "when_clause": (
+        "COMMUNICATION.md / external prose / 用户纠正：避免英文直译从句「当……时」「在……的时候」。"
+        "这类句式带有明显的翻译腔，损害中文叙述的自然连贯与呼吸感。\n"
+        "→ 下列每一处是否为「当……时 / 在……的时候」翻译腔句式？是则改用直接陈述句、动词前置或顺引句式。"
+    ),
     "banned_word": (
         "external prose / COMMUNICATION / 晨报与 AGY writer 稳定禁词表："
         "空评价（值得*、意义重大）、战争/生长隐喻（击穿、打穿、拆解、长出来、生长、收口、闭眼编）、"
@@ -185,6 +192,7 @@ META_PREAMBLE_RE = re.compile(
     r"总而言之|综上所述|下面我们来看|首先需要明确"
 )
 NOT_X_BUT_Y_RE = re.compile(r"不是[^，。；\n]{0,20}，而是")
+WHEN_CLAUSE_RE = re.compile(r"当[^，。！？\n]{2,30}?[时候]|在[^，。！？\n]{2,30}?时候")
 BANNED_WORD_RE = re.compile("|".join(re.escape(w) for w in BANNED_WORDS))
 BEI_RE = re.compile(r"被[\u4e00-\u9fff]{1,12}")
 MD_LINK_RE = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)]+)\)")

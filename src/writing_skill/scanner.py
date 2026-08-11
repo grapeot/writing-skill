@@ -19,6 +19,7 @@ from writing_skill.rules import (
     H2_RE,
     META_PREAMBLE_RE,
     NOT_X_BUT_Y_RE,
+    WHEN_CLAUSE_RE,
     POLARITY_RE,
     QUOTE_RE,
     RULES,
@@ -253,6 +254,18 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
             hits=[Hit(adj_line(h.line), h.text) for h in _collect_regex(scan, NOT_X_BUT_Y_RE)],
             hard=True,
             rule=RULES["not_x_but_y"],
+        )
+    )
+
+    # when_clause
+    wc = list(WHEN_CLAUSE_RE.finditer(scan))
+    checks.append(
+        CheckResult(
+            id="when_clause",
+            count=len(wc),
+            hits=[Hit(adj_line(h.line), h.text) for h in _collect_regex(scan, WHEN_CLAUSE_RE)],
+            hard=True,
+            rule=RULES["when_clause"],
         )
     )
 
