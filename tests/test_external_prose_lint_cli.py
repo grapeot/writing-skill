@@ -14,7 +14,7 @@ DIRTY = """# 《测试标题》
 
 “概念词”不该被引号包裹，这根本不是好写法。
 
-具体来说，我们不是要堆术语，而是要讲清楚动作。
+具体来说，我们不是要堆术语，而是要讲清楚动作。当 AI 在几秒钟里吐出代码时，不代表大功告成。在搭建系统的时候也需要注意。
 
 值得关注的是另一点。能力会自己长出来，再拆解一层结构性问题。
 
@@ -62,6 +62,7 @@ def test_scan_dirty_finds_hard_signals() -> None:
     assert by_id["polarity"].count >= 1
     assert by_id["meta_preamble"].count >= 1
     assert by_id["not_x_but_y"].count >= 1
+    assert by_id["when_clause"].count >= 2
     assert by_id["banned_word"].count >= 3  # 值得关注, 长出来, 拆解, 结构性…
     assert any("长出来" in h.text for h in by_id["banned_word"].hits)
     assert any("结构性" in h.text for h in by_id["banned_word"].hits)
@@ -193,5 +194,14 @@ def test_char_count_finding_when_under_2000() -> None:
     by_id = {c.id: c for c in report.checks}
     assert by_id["char_count"].has_finding
     assert "低于 2000 字" in by_id["char_count"].note
+
+
+def test_when_clause_translationese() -> None:
+    text = "当 AI 在几秒钟内吐出代码时，任务算不算完成？在搭建系统的时候需要注意。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["when_clause"].count == 2
+    assert by_id["when_clause"].has_finding
+
 
 

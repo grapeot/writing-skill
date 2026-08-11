@@ -46,6 +46,7 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `polarity` | 根本/绝不/极其/残酷现实… | HARD |
 | `meta_preamble` | 具体来说/接下来我们看… | HARD |
 | `not_x_but_y` | 不是…，而是… | HARD |
+| `when_clause` | 当…时 / 在…的时候 翻译腔从句 | HARD |
 | `banned_word` | 稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线/奠定基础…） | HARD |
 | `single_sentence_paragraph` | 汉字≥20 的单句自然段 | REVIEW |
 | `embedded_links` | `[text](url)` 计数 | INFO |
