@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-08-14
+
+- Updated the terminal cold-read `agy` fallback in `skills/workflow_external_writing.md` from `gemini-3.6-flash-high` to `gemini-3.7-flash-high`, matching the current Antigravity writing default.
+
 ### 2026-08-06
 
 - Refactored `src/writing_skill/` from single file into modular components: `models.py`, `rules.py`, `scanner.py`, `formatter.py`, `external_prose_lint_cli.py`.

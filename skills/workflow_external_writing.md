@@ -7,7 +7,7 @@
 - **前置依赖**：`workflow_deep_research_survey.md` Phase 1-3 或等价事实底稿。
 - **诊断词汇**：`bestpractice_external_prose.md`（Manager 查阅，不是 gate 清单，不进 Writer 上下文）。
 - **机械自查 CLI**：`external_prose_lint.md`（`external_prose_lint_cli.py`）。
-- **最后更新**：2026-08-06
+- **最后更新**：2026-08-14
 
 ## 0. 这个文件的纪律
 
@@ -94,7 +94,7 @@ Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的
 
 通过 Gate 1 后，执行不可跳过、不可 override 的终端陌生读者冷读：
 
-- **上下文**：全新独立 conversation（优先通过 Native Sub-agent 发起，无 sub-agent 则走 `agy --print`，用 `gemini-3.6-flash-high`，看不到任何 contract、brief 或聊天历史），只读最终 canonical Markdown 的正文。
+- **上下文**：全新独立 conversation（优先通过 Native Sub-agent 发起，无 sub-agent 则走 `agy --print`，用 `gemini-3.7-flash-high`，看不到任何 contract、brief 或聊天历史），只读最终 canonical Markdown 的正文。
 - **两个输出**：
   1. **读者姿态体感**：作者是在“分享发现的同行”，还是“高高在上的讲师/顾问/规范制定者”？
   2. **无术语复述测试**：能否不用专业术语复述出每一节到底发生了什么。
