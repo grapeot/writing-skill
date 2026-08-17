@@ -5,7 +5,7 @@
 - **Type**: Workflow
 - **Use case**: For readers who share project context: the author themselves, internal collaborators, AI agents, project workflows. Covers research memos, decision briefs, work logs, and execution summaries.
 - **Created**: 2026-06-11
-- **Last updated**: 2026-08-05
+- **Last updated**: 2026-08-16
 
 ---
 
@@ -104,7 +104,7 @@ For complex topics, the first screen defaults to a two-layer expression:
 1. **Plain-language layer**: first state who did what, what difference emerged, and which decision this affects. The reader must be able to restate it without knowing any new terminology.
 2. **Technical-precision layer**: only after the plain language has established meaning, provide the necessary metric names, system names, or strict qualifications.
 
-Technical expression cannot substitute for the plain-language layer. If removing English terms from a sentence makes it impossible to tell what actually happened, the author is still using labels in place of explanation.
+Technical expression cannot substitute for the plain-language layer. If removing English terms from a sentence makes it impossible to tell what actually happened, the author is still using labels in place of explanation. Complex conclusions may be presented using three blocks: Bottom Line / Why This Matters / Recommended Action.
 
 ### 4.3 Restore minimal context
 
@@ -120,23 +120,7 @@ After the first screen previews the conclusion, the explanatory body defaults to
 
 The first screen may preview the final decision to the reader; shipped/roadmap boundaries and action recommendations in the body should unfold after the problem and solution are already understandable. A decision preview cannot substitute for the explanation provided by the first two layers.
 
-### 4.5 Recommended conclusion card structure
-
-```markdown
-## Bottom Line
-
-One-sentence conclusion.
-
-## Why This Matters
-
-What judgment or action this affects.
-
-## Recommended Action
-
-What to do, or what to defer for now.
-```
-
-### 4.6 Segmented editing for long documents
+### 4.5 Segmented editing for long documents
 
 For longer documents, write in batches by heading, with at most 4 headings per batch. Within each batch, independently ensure correct concept presentation order; across batches, verify that concepts established in earlier batches are not prematurely referenced in later ones. This is more controllable than writing the entire document at once and then revising it wholesale, and it makes maintaining ordering consistency easier.
 
@@ -176,20 +160,16 @@ The skim layer may omit evidentiary detail but must not omit the prerequisites n
 
 ## 8. Pre-Delivery Verification
 
-Before delivery, complete the following checks from the reader's perspective. The first three are order and concept checks and carry the highest weight; if they fail, rearrange before addressing the others.
+An author who has just finished compressing material will pass every item on their own checklist. This section retains only checks that yield visible artifacts or countable criteria. Complete this in a single read-through; do not run separate passes per checklist item.
 
-1. **Term-lag test**: read sentence by sentence. For each new term as it first appears, has the action or consequence it names already appeared in the preceding text? If not, move the term later or add a concrete picture before it.
-2. **First-screen restatement test**: reading only the first screen, can the reader restate in plain language what happened and why it affects the current decision? If the restatement can only repeat the original terms verbatim, comprehension has not been achieved.
-3. **Research-compression inversion test**: does the document open from the author's final compressed system of terms? If so, rewrite to open from concrete actions and failure phenomena.
-4. **First-appearance concept audit**: list all newly introduced terms and metrics. When each first appears, are its role, statistical scope, and observable consequence already in place?
-5. **No-preread test**: does understanding any sentence require reading later text first? If so, rearrange the dependency order — do not shift the comprehension burden using "see below."
-6. **Decoding-tax audit**: is the reader's mental energy spent on judging facts and conclusions, or on translating jargon, expanding abbreviations, and guessing at abstract nouns? The latter should be rewritten as concrete people, actions, and results.
-7. **Concreteness test**: when abstract words like "governance, recovery, transparency, boundary, capability, efficiency" appear, has the preceding text already made concrete what was added, what was removed, and what can no longer continue?
-8. **Two-layer conclusion test**: before the technical conclusion, is there a plain-language version that does not depend on new terminology?
-9. **Concrete mental-model test**: can a reader encountering this subject for the first time concretely describe how the subject operates or changes, using the appropriate form among process flow, before/after comparison, timeline, role relationships, or causal chain?
-10. **Causal main-thread test**: can the reader separately answer "where the old system fell short," "why now," and "which step the new approach changes" — rather than only being able to restate product positioning?
-11. **Question-proportion test**: does the content directly answering the question contract make up the majority of the main text? If feature checklists, historical timelines, implementation boundaries, or experimental protocols dominate, restructure the document rather than continuing to add summaries.
-12. **Three-layer separation test**: after the first screen previews the conclusion, do the explanatory body's problem layer, solution layer, and decision layer arrive in comprehension-dependency order? Is the reader forced to decode GA status, roadmaps, or adoption plans before understanding the subject?
+1. **Term lag**: When each term, abbreviation, or proper noun first appears, the action, identity, or consequence it names must have already appeared in the preceding text. Understanding any sentence must not require reading later text first. Treat abstract words such as governance, capability, boundary, and efficiency as terms.
+2. **First-screen restatement**: Reading only the first screen, write three sentences: what happened, why it affects the current decision, and what the next step is. These three sentences must be posted alongside the first screen with the deliverable for reader spot-checking; the author must not substitute a self-attested "passed" for posting them. The restatement sentences must not contain any terms, abbreviations, or framework names newly introduced in this round. Opening from the author's final terminology system is the canonical failure mode of this test.
+3. **Three-layer arrival**: The first-screen plain-language layer arrives first. The problem layer (when the old approach fell short), solution layer (what actions changed), and decision layer (current progress, what to do) arrive in comprehension-dependency order without leapfrogging each other.
+4. **Question proportion**: Content directly answering the question contract must constitute the majority of the body. If feature lists, timelines, or protocols dominate, restructure the document.
+
+Additional requirement for research and explanatory memos: Before drafting, write the core conclusion in three plain-language sentences containing no newly introduced terms and at most one pair of numerical comparisons. These three sentences constitute the first-screen plain-language layer, not a warm-up exercise to discard after drafting. If at delivery these three sentences describe something different from the post-draft restatement sentences, the first screen has drifted. The core comparison defaults to a single table, with the remainder collapsed into folded sections. Work logs and execution summaries are verified against the multiple contracts in Section 4.1 and do not follow this paragraph.
+
+Only introduce an out-of-context cold reader to restate the first screen when deliverables are batched and readers cannot spot-check each one. The cold reader must simultaneously receive the list of terms shared prior to this round, judging only whether new concepts introduced in this round have plain-language stepping stones. Cold reading is an escalation mechanism, not a routine exemption path, and must not be framed as an automated machine gate.
 
 ---
 
