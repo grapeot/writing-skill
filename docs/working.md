@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### 2026-08-16
+
+- Streamlined pre-delivery verification in `workflow_internal_writing.md` (and its English mirror): replaced the 12-item self-attested checklist with 4 artifact/count-based checks (term lag, first-screen restatement, three-layer arrival, question proportion) and an explicit visible artifact requirement for research/explanatory memos.
+- Compressed conclusion card structure into Section 4.2 to maintain the one-in-one-out line budget.
+
 ### 2026-08-14
 
 - Updated the terminal cold-read `agy` fallback in `skills/workflow_external_writing.md` from `gemini-3.6-flash-high` to `gemini-3.7-flash-high`, matching the current Antigravity writing default.
@@ -23,3 +28,4 @@
 ## Lessons Learned
 
 - Keeping CLI thin and delegating core logic to `scanner`, `rules`, and `models` improves testability and maintains backwards compatibility for scripts and subagents.
+- Self-attested long checklists do not bind authors who have just finished compressing material (an author checking their own list will pass every item). Pre-delivery verification for research and explanatory memos must turn first-screen plain-language restatements into visible, postable artifacts that readers can spot-check.
