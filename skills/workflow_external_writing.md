@@ -27,9 +27,9 @@ Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的
 
 ### 1.1 执行载体与上下文隔离约束（Sub-agent 与 AGY CLI）
 
-在进行 Candidate 生成（Round 2）、强制全文整篇重写（Round 4）以及盲读/终端冷读（Section 5.2）时，必须做到完全独立的上下文隔离：
-- **当环境具备 Native Sub-agent 能力时**（例如当前 Harness 提供了 `invoke_subagent` 工具）：**必须通过 `invoke_subagent` 发起独立的 Sub-agent** 运行该生成、重写或冷读任务，禁止在 Main Agent 的同一个对话 context 里局部修正几行冒充重写或冷读。
-- **当环境不具备 Native Sub-agent 能力时**：退而使用 `antigravity_cli` 命令行工具（如 `agy --print`）拉起独立的命令行模型进程完成任务。
+在进行 Candidate 生成（Round 2）、强制全文整篇重写（Round 4）以及盲读/终端冷读（Section 5.2）时，必须做到完全独立的上下文隔离，禁止在 Main Agent 的同一个对话 context 里局部修正几行冒充重写或冷读：
+- **当运行环境本身就是 Antigravity 时**：直接调用 Antigravity 自己的 sub-agent 运行该生成、重写或冷读任务。
+- **其余所有环境**（OpenCode、Claude Code 等 harness）：一律通过 `antigravity_cli` 命令行工具（如 `agy --print`）拉起独立的命令行模型进程完成任务，不使用当前 harness 的 sub-agent 机制。
 
 ## 2. 输出路由与交付边界
 
@@ -63,7 +63,7 @@ Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的
    - 重点是事实保真、概念依赖图建立与 concrete carrier 铺设。
 
 2. **阶段二：强制全文整篇重写（`rewrite.md`）**
-   - **这是不可跳过的必经步骤**（参考 `ai_news_priority_research` 协议）：在一个独立全新的 conversation 中（优先走 Native Sub-agent，无 sub-agent 则走 `agy --print`），读取 `draft.md`、`writing_brief.md` 与 `voice_contract.md`，从头将全文整篇重写到 `rewrite.md`。
+   - **这是不可跳过的必经步骤**（参考 `ai_news_priority_research` 协议）：在一个独立全新的 conversation 中（Antigravity 本体内用其 sub-agent，其余环境一律走 `agy --print`），读取 `draft.md`、`writing_brief.md` 与 `voice_contract.md`，从头将全文整篇重写到 `rewrite.md`。
    - 任务核心：在严格保留事实、数字、URL、核心论点与结构的原则下，重新用自然中文的呼吸节奏打碎说明书式的单句段与教材式定义，替换掉行文中的机械连接词，赋予文章同行交流的视角。
 
 3. **阶段三：Prose QA（`rewrite_final.md`）**
@@ -94,7 +94,7 @@ Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的
 
 通过 Gate 1 后，执行不可跳过、不可 override 的终端陌生读者冷读：
 
-- **上下文**：全新独立 conversation（优先通过 Native Sub-agent 发起，无 sub-agent 则走 `agy --print`，用 `gemini-3.7-flash-high`，看不到任何 contract、brief 或聊天历史），只读最终 canonical Markdown 的正文。
+- **上下文**：全新独立 conversation（Antigravity 本体内用其 sub-agent，其余环境一律走 `agy --print`，用 `gemini-3.7-flash-high`，看不到任何 contract、brief 或聊天历史），只读最终 canonical Markdown 的正文。
 - **两个输出**：
   1. **读者姿态体感**：作者是在“分享发现的同行”，还是“高高在上的讲师/顾问/规范制定者”？
   2. **无术语复述测试**：能否不用专业术语复述出每一节到底发生了什么。
@@ -105,7 +105,14 @@ Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的
 
 ## 6. 配图
 
-短文（<2000 字）≥1 张，长文 ≥2-3 张。进最终 Markdown 的图必须来自 `gpt-image-2` 生成/重绘，压成 JPG/WebP，长边约 1024px、单图 <200KB，有相对路径与有效 alt text。视觉风格：淡色、典雅、简洁、商务；不用暗色/科幻/紫色/高饱和。
+短文（<2000 字）≥1 张，长文 ≥2-3 张。进最终 Markdown 的图必须来自 `gpt-image-2` 生成/重绘，压成 JPG/WebP，长边约 1024px、单图 <200KB，有相对路径与 alt（alt 写完整判断句）。
+
+视觉风格以发布渠道为准：若工作区的 publish skill 声明了站点视觉规范（site visual language），成图必须遵循该规范的构图、配色、渲染档位与文字纪律，并跟随其更新；两者冲突时以站点规范为准，不在本文件内复述细节。若工作区没有站点视觉规范，退回以下 pinned 摘要（pin 自 yage.ai/share 站点视觉规范 2026-08-20 版）：
+
+- 构图三选一：对比面板（A vs B）/ 传导链（因果流程，3-5 节点）/ 分层全景（层级系统）；一张图只讲一个判断。
+- 语义四色：奶油底 `#F6F2E7`；结构 `#6B7FE8`（线稿档 `#8298FF`）；钱/价值 `#E8A33D`（克制使用）；负信号 `#C6574A`（线稿档 `#C26B5A`，至多一处）；线字 `#2E3442`（线稿档 `#3A4150`）。
+- 渲染二选一：像素档为默认（flat solid fills、chunky pixels、8-16 色、无渐变无抗锯齿），适合机制隐喻与概念对比；依赖精确标注（尺寸、条文、时间戳）的数据/协议/政策图用线稿档；同一篇内不混档。
+- 图内文字压到最少：2-6 字短标签或裸数字，句子一律不进图。
 
 ## 7. 交付
 

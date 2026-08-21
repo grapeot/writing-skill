@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-08-21
+
+- Reworked the image section of `skills/workflow_external_writing.md` (and its English mirror §10): visual style now defers to the workspace publish skill's site visual language spec when one exists (single source of truth, tracks updates, no detail duplication here); otherwise falls back to a pinned summary (pinned from yage.ai/share site visual language spec 2026-08-20: three composition archetypes, semantic four-color palette with hex values, pixel tier as default rendering, no tier mixing within one article, 2-6 character in-image text limit). Fixes a drift where this file's old "light/elegant/business" instruction contradicted the pixel-tier semantic-palette spec enforced at publish time.
+
 ### 2026-08-16
 
 - Streamlined pre-delivery verification in `workflow_internal_writing.md` (and its English mirror): replaced the 12-item self-attested checklist with 4 artifact/count-based checks (term lag, first-screen restatement, three-layer arrival, question proportion) and an explicit visible artifact requirement for research/explanatory memos.
