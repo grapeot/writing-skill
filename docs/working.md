@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-08-22
+
+- Redesigned `skills/twitter_post_writing.md` (and English mirror) to the structure-reuse route after two field failures with invented structures: the post now retells the article in its own section order (~400 chars, thesis stated declaratively where the article states it) instead of the two-stage isolated generation with opener/ending rotation tables. Generation prompt adds narration-rhythm requirements (retelling mindset, hypothesis/verdict in separate paragraphs with hedging, details entering with a function sentence, fast/slow paragraph alternation) after user feedback that compliant-but-rushed posts still read wrong; blind judges scoring red-line checklists cannot detect rhythm problems, human feel can. Gate B gains a structure check; known-traps table records the four failed iterations.
+
 ### 2026-08-21 (2)
 
 - Added `skills/twitter_post_writing.md`: channel sub-workflow for turning a finished external article into a Twitter distribution post. Two isolated AGY generation stages (extract the article's epistemic shift into a plain draft, then rewrite into a long post with rotated opener/ending modes), a lint-subset mechanical gate plus tweet-specific checks (no headings, exactly one trailing tracked distribution URL on the author's own domain, no bare domains), and a fact-fidelity gate that mechanically re-checks every number/unit against the article. Root cause evidence: 2026-08 audit of 20 published tweets (template convergence 19/20, aphorism density 4-7 per tweet, fact drift such as unit swaps and derived multipliers). Root router `skills/writing_workflows.md` updated.
