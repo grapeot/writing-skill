@@ -16,6 +16,8 @@ Two writing workflows, one shared diagnostic vocabulary, and one deterministic l
 
 2. **External writing** (`workflow_external_writing.md`) — for readers who lack shared context (the public, clients, course audiences). The goal is a finished analytical article that reads like a practitioner sharing a finding, not a lecturer walking a student through a syllabus. Core technique: three-context separation (editorial / drafting / acceptance), double-generation single-review, separated cold-read acceptance, a terminal cold read whose verdict is machine-extracted and blocks "done".
 
+3. **Twitter post writing** (`twitter_post_writing.md`) — channel sub-workflow of external writing: turn a finished article into a distribution tweet (Typefully long post) without inheriting the article's aphorism layer or collapsing into a template. Core technique: two isolated generation stages (extract the epistemic shift, then rewrite), opener/ending pattern rotation, lint-subset plus tweet-specific mechanical gates, and a fact-fidelity check against the article.
+
 The two share a voice target (practitioner, not lecturer), a diagnostic vocabulary (`bestpractice_external_prose.md`), a thesis catalog (`reference_writing_thesis_catalog.md`), and a mechanical hygiene CLI (`external_prose_lint.md`).
 
 ## Step 0 — Route the task
@@ -32,6 +34,7 @@ Before drafting, classify the audience:
 |---|---|---|
 | `workflow_internal_writing.md` | Drafting an internal memo, decision brief, work log | The agent doing the drafting |
 | `workflow_external_writing.md` | Drafting an external-facing article, survey report, course asset | The Main Agent (editorial + acceptance) and the writer conversation (drafting) |
+| `twitter_post_writing.md` | Turning a finished external article into a Twitter distribution post (Typefully long post) | The agent orchestrating publication; the two AGY generation calls |
 | `bestpractice_external_prose.md` | Diagnosing why a candidate draft sounds like a textbook or is cognitively overloaded; writing the `voice_contract.md` | Main Agent only. Never paste into the writer context. Not a gate checklist. |
 | `reference_writing_thesis_catalog.md` | Brainstorming the thesis of an external article; finding the analytical angle | Main Agent during Round 1 (thesis / structure) |
 | `external_prose_lint.md` | Mechanical hygiene self-check on a Chinese external draft | The agent running the lint CLI |
