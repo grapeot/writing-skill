@@ -2,6 +2,13 @@
 
 ## Changelog
 
+### 2026-08-21 (2)
+
+- Added `skills/twitter_post_writing.md`: channel sub-workflow for turning a finished external article into a Twitter distribution post. Two isolated AGY generation stages (extract the article's epistemic shift into a plain draft, then rewrite into a long post with rotated opener/ending modes), a lint-subset mechanical gate plus tweet-specific checks (no headings, exactly one trailing tracked distribution URL on the author's own domain, no bare domains), and a fact-fidelity gate that mechanically re-checks every number/unit against the article. Root cause evidence: 2026-08 audit of 20 published tweets (template convergence 19/20, aphorism density 4-7 per tweet, fact drift such as unit swaps and derived multipliers). Root router `skills/writing_workflows.md` updated.
+- Added a warm/natural voice target to both AGY prompt cores (first-person turns + light colloquial markers + sentence breathing; decoration-based friendliness listed as failure), with a note that mechanical gates are orthogonal to warmth, plus the matching known-trap row. Verified on 2 posts: one passed clean, one needed 2 mechanical fixes (em dash, when-clause).
+- Revised the voice target to news/analysis style after user correction: no first-person narration (epistemic shifts carried by subject-less narration), `grep -c 我` = 0 added to acceptance criteria. Added cognitive-burden budget: one thread per post, ≤6 numeric tokens (mechanically counted, URL line excluded), ≤4 named entities, one job per paragraph.
+- Full 20-post rewrite under the cognitive-burden budget passed all gates (numeric tokens 0-6 per post vs 8-12 before). Added two traps from this run: over-pruning load-bearing evidence when cutting to one thread, and parallel `agy --print` session cross-talk (serialize agy calls per scratch dir, absolute prompt paths, verify artifacts non-empty before gating).
+
 ### 2026-08-21
 
 - Reworked the image section of `skills/workflow_external_writing.md` (and its English mirror §10): visual style now defers to the workspace publish skill's site visual language spec when one exists (single source of truth, tracks updates, no detail duplication here); otherwise falls back to a pinned summary (pinned from yage.ai/share site visual language spec 2026-08-20: three composition archetypes, semantic four-color palette with hex values, pixel tier as default rendering, no tier mixing within one article, 2-6 character in-image text limit). Fixes a drift where this file's old "light/elegant/business" instruction contradicted the pixel-tier semantic-palette spec enforced at publish time.
