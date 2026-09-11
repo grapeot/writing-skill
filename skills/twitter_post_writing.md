@@ -6,7 +6,8 @@
 - **适用场景**：从一篇已通过双重 gate 的文章生成 Twitter 导流文案（Typefully long post，中文）。发布动作本身（创建 draft、schedule）归发布层 skill，不在本文件内。
 - **上游**：`workflow_external_writing.md`（文章层工作流与 gate 哲学）。
 - **创建**：2026-08-21；2026-08-22 改版为"结构复用"路线（v2，见陷阱表最后两行：另起结构的两次实测失败）。
-- **执行者**：调用方 agent 编排；生成走 `agy --print`（Antigravity CLI，独立上下文），机械检查走 lint CLI 与确定性命令。
+- **执行者**：调用方 agent 编排；生成默认走 Cursor CLI（独立上下文，Gemini 3.8 Flash High），机械检查走 lint CLI 与确定性命令。
+- **最后更新**：2026-09-10
 
 ## 0. 核心原则：复用文章结构，只治文风
 
@@ -17,7 +18,7 @@
 ## 1. 工作流总览
 
 ```
-文章 MD ──→ 单次 AGY 生成（读文章全文，按章节顺序压缩成 ~400 字推文，文风约束内置）
+文章 MD ──→ 单次 Cursor 生成（读文章全文，按章节顺序压缩成 ~400 字推文，文风约束内置）
         └─→ Gate A（机械：lint 适用子集 + tweet 特有检查，必须清零）
         └─→ Gate B（事实保真：数字/量词/限定词逐项对照文章）
              └─→ tweet_final.md（交付给发布流程）
@@ -27,7 +28,17 @@
 
 ## 2. 生成 prompt 核心（单次，可直接使用）
 
-独立 `agy --print` 调用（`gemini-3.7-flash-high`，`--print-timeout 10m`，scratch 目录内执行，prompt 用绝对路径）：
+先读 [ai-agent-cli 根 skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) 与 [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md)。通用技术说明留在那里；本任务使用独立 minimal scratch 与绝对路径 prompt：
+
+```bash
+cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path/to/minimal-scratch --output-format json "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md."
+```
+
+- 调用方控制 10 分钟任务超时；quota 错误立即停止，不延长超时或循环重试。
+- 每次生成及失败重跑均为全新 Cursor 会话，不用 `--resume` / `--continue`。
+- 启动时进程 cwd 与 `--workspace` 必须同时指向该次调用的独立 minimal scratch。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
+- scratch 仅放文章正文与本轮生成 prompt（含发布层提供的 URL 和具体修正要求），不看旧文案。
+- 成功必须同时满足 exit 0、JSON `type: "result"` / `subtype: "success"` / `is_error: false`，以及 `tweet_final.md` 非空且读回核验，再进入 Gate A/B。
 
 > 读下面这篇文章，写一条 Twitter 导流长推文。
 > 1. **心态：转述，不是摘要**。想象给同事转述一篇刚读完的分析：挑着讲、关键处放慢、用自己的口语连接（"从数据上看""说白了""这就导致"）。摘要心态会让每句话高效推进，读起来赶；转述心态有快有慢。
@@ -101,7 +112,7 @@ Gate B 必须逐项贴出对照结果，禁止自述"核对过了"。
 | 另起结构：事件线替代分析线（uipath v2 实测） | "压缩"被执行成新闻帖（发布→功能→机制→观望），thesis 和承重对照被砍，文章最值钱的判断丢失 | v2 改为结构复用：按文章章节顺叙，thesis 陈述式在场，承重对照不砍 |
 | 另起结构：抽取式重写丢结构（uipath v3 实测） | 隔离重写虽保 thesis 但重排叙事（微软开场），用户判定不如照文章顺序的旧版结构 | 同上；旧版文案的结构优势来自文章本身，复用它 |
 | 节奏急（实测，用户反馈） | 无主语认识运动被写成连动压缩句（"起初容易以为X，查完发现Y"），假设与裁决挤一句快进，读感赶；细节出场不带功能（气动泵 shot 讲不出 so what）；盲评模型按红线打分判不出此病，人类体感才暴露 | 假设段与裁决段分开、各带缓冲词；禁连动压缩句；细节带功能句出场；生成心态从"摘要"改为"转述" |
-| agy 并行会话串线 | 同时跑多个 `agy --print` 时串到无关会话，读错 prompt、写错文件 | 同 scratch 目录串行执行；绝对路径；产出先验证非空对题 |
+| AGY 历史：并行会话串线 | 同时跑多个 `agy --print` 时曾串到无关会话，读错 prompt、写错文件；非 Cursor 故障记录 | 当时的应对：同 scratch 目录串行执行；绝对路径；产出先验证非空对题 |
 
 ## 7. 输出规格
 

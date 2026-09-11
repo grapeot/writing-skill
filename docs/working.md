@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 2026-09-10
+
+- Follow-up review: replaced the drifted English external spine with a concise mirror of the Chinese canonical four-stage pipeline (`draft.md` -> mandatory `rewrite.md` -> independent Prose QA `rewrite_final.md` -> manager mechanical pass), preserving stage inputs and both terminal gates. Synchronized the root external entry without changing audience/input scope. External and Twitter instructions now require both process cwd and `--workspace` to target each call's minimal scratch and prohibit loading parent-workspace/global writing rules into the child; directory isolation alone does not establish that boundary. Removed migration-only exception and obsolete-flag commentary while retaining caller-controlled 10-minute timeouts, fresh sessions, verification, and quota stops. Refreshed changed dates and corrected the image section reference and lint module path in the Chinese spine and English mirror. Historical AGY traps are unchanged.
+
+- Migrated the default runner for external drafting, rewrite, QA, cold reads, and Twitter generation to Cursor CLI (`gemini-3.8-flash-high`) across all harnesses, without native subagent exceptions. Focused workflows retain caller-controlled 10-minute timeouts, fresh sessions, minimal scratch input boundaries, JSON success checks, non-empty artifact readback, and immediate quota-error stops; shared technical contracts link to the public ai-agent-cli root and Cursor focused skill. Updated the root router's stale Twitter generation description to match the existing single-stage workflow. Preserved writing stages and quality gates, limited English mirror changes to related execution sections, and labeled AGY cross-talk as historical rather than a Cursor failure. The existing English-language root router has no separate `skills_en` mirror.
+
 ### 2026-08-22
 
 - Redesigned `skills/twitter_post_writing.md` (and English mirror) to the structure-reuse route after two field failures with invented structures: the post now retells the article in its own section order (~400 chars, thesis stated declaratively where the article states it) instead of the two-stage isolated generation with opener/ending rotation tables. Generation prompt adds narration-rhythm requirements (retelling mindset, hypothesis/verdict in separate paragraphs with hedging, details entering with a function sentence, fast/slow paragraph alternation) after user feedback that compliant-but-rushed posts still read wrong; blind judges scoring red-line checklists cannot detect rhythm problems, human feel can. Gate B gains a structure check; known-traps table records the four failed iterations.
@@ -41,6 +47,10 @@
 - Prepared for privacy review, GitHub repo creation, and migration of the two context-infrastructure repos.
 
 ## Lessons Learned
+
+- A mirror that still teaches a different generation pipeline remains contradictory even after its CLI names are updated. Review stage order and input scopes against the canonical workflow, not just runner names. A minimal scratch directory is not an automatic rule shield: set both cwd and `--workspace`, and do not forward parent-workspace or global writing rules to the child.
+
+- Keep task-specific session isolation, authorized inputs, and timeouts in focused workflows while sharing generic CLI mechanics through the tool skill. Runner migrations must label historical tool failures accurately, not attribute AGY incidents to Cursor; English mirror drift is not a reason to rewrite unrelated workflow stages.
 
 - Keeping CLI thin and delegating core logic to `scanner`, `rules`, and `models` improves testability and maintains backwards compatibility for scripts and subagents.
 - Self-attested long checklists do not bind authors who have just finished compressing material (an author checking their own list will pass every item). Pre-delivery verification for research and explanatory memos must turn first-screen plain-language restatements into visible, postable artifacts that readers can spot-check.

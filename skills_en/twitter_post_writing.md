@@ -8,7 +8,8 @@
 - **Use when**: turning a finished, double-gated article into a Twitter distribution post (Typefully long post, Chinese). Publish actions (draft creation, scheduling) belong to the publishing-layer skill.
 - **Upstream**: `workflow_external_writing.md` (article-level workflow and gate philosophy).
 - **Created**: 2026-08-21; redesigned 2026-08-22 as the "structure reuse" route (v2) after two field failures with invented structures, then v3 added narration-rhythm requirements after user feedback.
-- **Executor**: the calling agent orchestrates; generation goes through one isolated `agy --print` call; mechanical checks go through the lint CLI and deterministic commands.
+- **Executor**: the calling agent orchestrates; generation defaults to one isolated Cursor CLI call (`gemini-3.8-flash-high`); mechanical checks go through the lint CLI and deterministic commands.
+- **Last updated**: 2026-09-10
 
 ## 0. Core principle: reuse the article's structure, fix only the voice
 
@@ -19,7 +20,7 @@ Anti-template convergence is likewise inherited from the articles themselves. On
 ## 1. Workflow overview
 
 ```
-Article MD ──→ single AGY generation (reads the full article, retells it in section order at ~400 chars, voice constraints built in)
+Article MD ──→ single Cursor generation (reads the full article, retells it in section order at ~400 chars, voice constraints built in)
            └─→ Gate A (mechanical: lint subset + tweet-specific checks, must be zero)
            └─→ Gate B (fact fidelity + structure check against the article)
                 └─→ tweet_final.md (handed to the publishing flow)
@@ -29,7 +30,17 @@ The generation call never sees prior posts (prevents anchoring). The earlier two
 
 ## 2. Generation prompt core (single call, directly usable)
 
-Run inside a scratch directory with an absolute-path prompt file (`gemini-3.7-flash-high`, `--print-timeout 10m`):
+First read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md). General CLI mechanics stay there; this task uses a dedicated minimal scratch directory and an absolute-path prompt:
+
+```bash
+cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path/to/minimal-scratch --output-format json "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md."
+```
+
+- The caller controls a 10-minute task timeout; stop on quota errors immediately without extending timeout or retrying in loops.
+- Each generation and failure rerun starts a fresh Cursor session, never `--resume` / `--continue`.
+- At launch, process cwd AND `--workspace` must both point to that call's dedicated minimal scratch. The caller must not load parent-workspace rules or global writing rules into the child; a separate directory is not an automatic rule shield.
+- Scratch contains only article text and this round's prompt (including the publishing-layer URL and specific correction requests), never prior posts.
+- Success requires exit 0 AND JSON `type: "result"` / `subtype: "success"` / `is_error: false` AND a non-empty `tweet_final.md` read back from disk before entering Gate A/B.
 
 > Read the article below and write a Twitter distribution long post.
 > 1. **Mindset: retelling, not summarizing.** Imagine telling a colleague about an analysis you just read: pick what matters, slow down at key points, connect with your own spoken phrases ("looking at the data…", "in plain terms…", "which is why…"). A summary mindset makes every sentence push forward efficiently and reads rushed; a retelling has fast and slow parts.
@@ -101,7 +112,7 @@ An agent that did not generate the post should judge from artifacts alone:
 | Invented structure: event line replaces analysis line (uipath v2) | "compression" became a news post (launch → features → mechanics → wait-and-see); thesis and load-bearing contrast deleted | structure reuse: follow the article's sections; thesis declarative; contrast kept |
 | Invented structure: extractive rewrite scrambles order (uipath v3) | rewrite kept thesis but reordered narration (Microsoft-first); user judged the article-order version better | same |
 | Rushed rhythm (user feedback; blind judges cannot detect it) | epistemic movement written as compressed double-action sentences; details entered without their so-what; checklist-style rapid-fire | hypothesis and verdict in separate paragraphs with hedging; ban compressed double-action sentences; details enter with a function sentence; retelling mindset instead of summary mindset; note that blind evaluation by red-line checklists scores this wrong — human feel catches it |
-| Parallel CLI session cross-talk | concurrent headless runs read wrong prompts, wrote wrong files | serialize per scratch dir; absolute paths; verify artifacts non-empty before gating |
+| AGY historical: parallel session cross-talk | concurrent `agy --print` runs read wrong prompts and wrote wrong files; not a recorded Cursor failure | historical remedy: serialize per scratch dir; absolute paths; verify artifacts non-empty before gating |
 
 ## 7. Output spec
 
