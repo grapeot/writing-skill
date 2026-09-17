@@ -19,6 +19,10 @@ from writing_skill.rules import (
     H2_RE,
     META_PREAMBLE_RE,
     NOT_X_BUT_Y_RE,
+    NUMBER_DENSITY_PARA_MIN_NUMBERS,
+    NUMBER_DENSITY_WINDOW_MIN_NUMBERS,
+    NUMBER_DENSITY_WINDOW_PARAS,
+    NUMBER_TOKEN_RE,
     WHEN_CLAUSE_RE,
     POLARITY_RE,
     QUOTE_RE,
@@ -297,10 +301,12 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
     ssp_hits: list[Hit] = []
     ssp_count = 0
     prose_paras = 0
+    all_prose_paras: list[tuple[int, str]] = []
     for start_line, block in _paragraph_blocks(scan):
         if not _is_prose_paragraph(block):
             continue
         prose_paras += 1
+        all_prose_paras.append((start_line, block))
         sc = _sentence_count(block)
         cjk_n = len(CJK_RE.findall(block))
         if sc == 1 and cjk_n >= 20:
@@ -317,6 +323,47 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
             hard=False,
             rule=RULES["single_sentence_paragraph"],
             note=f"prose_paragraphs={prose_paras}",
+        )
+    )
+
+    # number density (laundry list detector)
+    prose_para_list: list[tuple[int, int, str]] = []
+    for start_line, block in all_prose_paras:
+        prose_para_list.append((start_line, len(NUMBER_TOKEN_RE.findall(block)), block))
+
+    density_hits: list[Hit] = []
+    density_paras: list[tuple[int, int]] = []  # (line, number_count)
+    for start_line, num_count, _block in prose_para_list:
+        if num_count >= NUMBER_DENSITY_PARA_MIN_NUMBERS:
+            density_paras.append((start_line, num_count))
+    # consecutive-window rule: >= WINDOW_PARAS consecutive prose paragraphs each with >= WINDOW_MIN numbers
+    for i in range(len(prose_para_list) - NUMBER_DENSITY_WINDOW_PARAS + 1):
+        window = prose_para_list[i : i + NUMBER_DENSITY_WINDOW_PARAS]
+        if all(nc >= NUMBER_DENSITY_WINDOW_MIN_NUMBERS for _, nc, _ in window):
+            window_lines = {start_line for start_line, _, _ in window}
+            already = {line for line, _ in density_paras}
+            for start_line in sorted(window_lines - already):
+                nc = next(nc for sl, nc, _ in prose_para_list if sl == start_line)
+                density_paras.append((start_line, nc))
+    density_paras.sort()
+    for start_line, _nc in density_paras[:20]:
+        for start_line_b, _nc2, block in prose_para_list:
+            if start_line_b == start_line:
+                first = block.strip().splitlines()[0]
+                snippet = first if len(first) <= 72 else first[:71] + "…"
+                density_hits.append(Hit(adj_line(start_line), snippet))
+                break
+    checks.append(
+        CheckResult(
+            id="number_density",
+            count=len(density_paras),
+            hits=density_hits,
+            hard=False,
+            rule=RULES["number_density"],
+            note=(
+                f"单段≥{NUMBER_DENSITY_PARA_MIN_NUMBERS}个数字或连续{NUMBER_DENSITY_WINDOW_PARAS}段各≥"
+                f"{NUMBER_DENSITY_WINDOW_MIN_NUMBERS}个数字；疑似 laundry list，需人工判断"
+            ),
         )
     )
 
@@ -428,6 +475,7 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
         "bare_urls": len(bare_filtered),
         "quotes": len(q_all),
         "single_sentence_paragraphs": ssp_count,
+        "number_density_paragraphs": len(density_paras),
         "findings": 0,
         "hard_findings": 0,
     }

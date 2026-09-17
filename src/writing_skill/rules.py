@@ -14,6 +14,7 @@ CHECK_ORDER = [
     "not_x_but_y",
     "when_clause",
     "banned_word",
+    "number_density",
     "single_sentence_paragraph",
     "embedded_links",
     "bare_url",
@@ -132,6 +133,16 @@ RULES: dict[str, str] = {
         "→ 下列命中是否 AI 腔/空修辞？是则改成具体动作、事实或中性表述；"
         "若是不可替代的技术本义（如生物学「生长」），保留并在自查里写明理由。"
     ),
+    "number_density": (
+        "用户纠正：数字高浓度罗列是 laundry list 信号——看起来有内容，读者直接跳过。"
+        "若连续段落（≥2 段）各含 ≥3 个数字，或单段含 ≥6 个数字，触发本项。"
+        "诊断改法（bestpractice_external_prose.md 枚举税）："
+        "从数字堆里找出一到两个最关键的直觉只展开它们，"
+        "或把数字归类成 2-3 组各配一句因果，或把次要数字移入材料清单。\n"
+        "→ 下列段落是否 laundry list 式事实罗列？"
+        "是则按上述三种改法降低认知负担；若数字确为逐项核对所需（如账单明细），"
+        "保留并在自查里写明理由。"
+    ),
     "single_sentence_paragraph": (
         "用户高频纠正（>50% 写作 session）：不要大量自然段只有一句话；"
         "按语义逻辑合理合并，不必 aggressive，但不要说明书式单句段连排。"
@@ -150,8 +161,9 @@ RULES: dict[str, str] = {
     ),
     "h2_count": (
         "workflow_external_writing：正文的 H2 章节数量建议最多 4 个；"
-        "如果 H2 章节超过 4 个，内容容易切得太碎，请合理合并或精简章节。\n"
-        "→ 当前 H2 数量是否超过 4 个？如超过请做合并。"
+        "如果 H2 章节超过 4 个，内容容易切得太碎，请合理合并或精简章节。"
+        "多事件简报/堆叠体裁可在自查中说明理由保留。\n"
+        "→ 当前 H2 数量是否超过 4 个？如超过请做合并，或在自查中写明体裁理由。"
     ),
     "title_book_marks": (
         "用户纠正：标题不要用书名号《》。\n"
@@ -198,6 +210,18 @@ BEI_RE = re.compile(r"被[\u4e00-\u9fff]{1,12}")
 MD_LINK_RE = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)]+)\)")
 MD_IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 BARE_URL_RE = re.compile(r"(?<!\()(?<!\]\()https?://[^\s)\]>\"']+")
+
+# Number-density (laundry list) detection: any Arabic numeral run or CJK numeral
+# used as data. Matches integers, decimals, percentages, and common unit pairs.
+NUMBER_TOKEN_RE = re.compile(
+    r"\d+(?:[.,]\d+)?"
+)
+
+# Number-density thresholds per paragraph.
+NUMBER_DENSITY_PARA_MIN_NUMBERS = 6  # single paragraph with >= 6 numbers → candidate
+NUMBER_DENSITY_WINDOW_PARAS = 2  # >= 2 consecutive prose paragraphs
+NUMBER_DENSITY_WINDOW_MIN_NUMBERS = 3  # each with >= 3 numbers
+
 H1_RE = re.compile(r"^#\s+(.+)$", re.M)
 H2_RE = re.compile(r"^##\s+(.+)$", re.M)
 SENTENCE_END_RE = re.compile(r"[。！？…]+|[.!?](?=\s|$)")

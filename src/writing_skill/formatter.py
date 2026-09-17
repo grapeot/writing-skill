@@ -16,7 +16,8 @@ def format_text(report: Report, *, max_hits: int = 15) -> str:
         f"cjk_chars={s['cjk_chars']} | prose_paragraphs={s['prose_paragraphs']} | "
         f"h2={s['h2']} | md_links={s['md_links']} | images={s['images']} | "
         f"bare_urls={s['bare_urls']} | quotes={s['quotes']} | "
-        f"single_sentence_paragraphs={s['single_sentence_paragraphs']}"
+        f"single_sentence_paragraphs={s['single_sentence_paragraphs']} | "
+        f"number_density_paragraphs={s.get('number_density_paragraphs', 0)}"
     )
     lines.append(
         f"findings={s['findings']} (hard={s['hard_findings']}) — "
