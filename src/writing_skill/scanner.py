@@ -329,7 +329,10 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
     # number density (laundry list detector)
     prose_para_list: list[tuple[int, int, str]] = []
     for start_line, block in all_prose_paras:
-        prose_para_list.append((start_line, len(NUMBER_TOKEN_RE.findall(block)), block))
+        # strip markdown link URLs and image URLs: version numbers inside URLs are
+        # identifiers, not prose-number piles. Keep anchor text for counting.
+        cleaned_block = MD_LINK_RE.sub(r"\1", block)
+        prose_para_list.append((start_line, len(NUMBER_TOKEN_RE.findall(cleaned_block)), block))
 
     density_hits: list[Hit] = []
     density_paras: list[tuple[int, int]] = []  # (line, number_count)
