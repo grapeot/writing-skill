@@ -77,3 +77,17 @@ python -m pytest rules/skills/tests/test_external_prose_lint_cli.py -q
 - CLI: `rules/skills/external_prose_lint_cli.py`
 - Tests: `rules/skills/tests/test_external_prose_lint_cli.py`
 - Workflow hook: `rules/skills/workflow_external_writing.md` §7 / §9
+
+## number_density (laundry-list detection)
+
+High-density number listing is the mechanical signal of a laundry list: it looks substantive, but readers skip it. Detection rule (REVIEW level, not a final judgment):
+
+- a single prose paragraph containing >= 6 number tokens (Arabic numeral runs), or
+- >= 2 consecutive prose paragraphs each containing >= 3 number tokens.
+
+After it fires, the LLM judges:
+1. Is the paragraph a laundry list of facts (numbers without causality, imagery, or relations a reader can build)?
+2. If yes: pick 1-2 key intuitions from the number pile and expand only those; or group the numbers into 2-3 clusters each with one causal sentence; or move secondary numbers to a materials list/table.
+3. If the numbers are genuinely item-by-item checkable data (billing breakdown, benchmark table), keep them and state the reason in the self-check.
+
+Command unchanged: `python -m writing_skill.external_prose_lint_cli path/to/article.md`. Stats now include `number_density_paragraphs`.

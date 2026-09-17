@@ -58,3 +58,7 @@
 
 - Keeping CLI thin and delegating core logic to `scanner`, `rules`, and `models` improves testability and maintains backwards compatibility for scripts and subagents.
 - Self-attested long checklists do not bind authors who have just finished compressing material (an author checking their own list will pass every item). Pre-delivery verification for research and explanatory memos must turn first-screen plain-language restatements into visible, postable artifacts that readers can spot-check.
+
+### 2026-09-16 (b)
+
+- Added the `number_density` laundry-list finding to the lint CLI after a field session where a user flagged number-dense paragraphs as skip-inducing fact dumps. Detection is purely countable: a single prose paragraph with ≥6 number tokens, or ≥2 consecutive prose paragraphs each with ≥3 tokens; verdict is REVIEW (LLM judges whether it is a laundry list, restructures to 1-2 key intuitions or 2-3 causal groups, or justifies keeping raw numbers). Rules/thresholds live in `rules.py` (`NUMBER_DENSITY_*`); scanner collects prose paragraphs shared with the single-sentence check; formatter stats gain `number_density_paragraphs`. `external_prose_lint.md` (+ EN mirror) documents the finding and the three remediation moves. The h2_count rule text now mentions the multi-item briefing genre exception. Tests updated with laundry-list and control cases; 18 passing.

@@ -76,3 +76,17 @@ python -m pytest tests/test_external_prose_lint_cli.py -q
 - CLI：`src/writing_skill/external_prose_lint_cli.py`
 - 测试：`tests/test_external_prose_lint_cli.py`
 - 工作流接入：`skills/workflow_external_writing.md` §7 / §9
+
+## number_density（laundry list 检测）
+
+数字高浓度罗列是 laundry list 的机械信号：看起来有内容，读者直接跳过。检测规则（REVIEW 级，不做最终判断）：
+
+- 单个 prose 段落含 ≥6 个数字 token（阿拉伯数字串），或
+- 连续 ≥2 个 prose 段落各含 ≥3 个数字 token。
+
+触发后的处理（交给 LLM 判断）：
+1. 判断该段落是否 laundry list 式事实罗列（数字之间没有因果、没有画面、读者无法建立关系）。
+2. 若是：从数字堆里找出 1-2 个最关键的直觉只展开它们；或把数字归类成 2-3 组各配一句因果；或把次要数字移到材料清单/表格。
+3. 若数字确为逐项核对所需（账单明细、对照实验结果表），保留并在自查里写明理由。
+
+命令不变：`python -m writing_skill.external_prose_lint_cli path/to/article.md`。输出 stats 新增 `number_density_paragraphs`。

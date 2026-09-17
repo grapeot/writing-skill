@@ -38,6 +38,8 @@ class CheckResult:
             return self.count > 0
         if self.id == "bei_passive":
             return self.count > 0
+        if self.id == "number_density":
+            return self.count > 0  # laundry-list warning: LLM must judge and restructure or justify
         return self.count > 0
 
 
