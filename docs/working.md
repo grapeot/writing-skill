@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-09-16
+
+- Added `skills/workflow_news_aggregation.md` (+ English mirror): a channel sub-workflow for recurring multi-item news briefings with three separable operations. Operation 1 packs one research item into a self-contained information packet inside the dated `tmp/news_aggregation_<YYYYMMDD>/` folder, located by listing and exact date match, never created by the agent, flat `<topic>_information_packet.md` layout. Operation 2 agrees the outline with the user with stacked independent items as the default and an explicit ban on manufactured unified themes. Operation 3 runs the external writing pipeline unchanged, with channel adjustments (per-section fact discipline, per-item audience isolation, H2-count review answered as stacked items, length convergence via content-map deletion not taste edits). Updated the root router (`writing_workflows.md`) with the new workflow and routing row, bumped its date, and mirrored both in `skills_en/`. AGENTS.md structure list gains the new file.
+
 ### 2026-09-10
 
 - Follow-up review: replaced the drifted English external spine with a concise mirror of the Chinese canonical four-stage pipeline (`draft.md` -> mandatory `rewrite.md` -> independent Prose QA `rewrite_final.md` -> manager mechanical pass), preserving stage inputs and both terminal gates. Synchronized the root external entry without changing audience/input scope. External and Twitter instructions now require both process cwd and `--workspace` to target each call's minimal scratch and prohibit loading parent-workspace/global writing rules into the child; directory isolation alone does not establish that boundary. Removed migration-only exception and obsolete-flag commentary while retaining caller-controlled 10-minute timeouts, fresh sessions, verification, and quota stops. Refreshed changed dates and corrected the image section reference and lint module path in the Chinese spine and English mirror. Historical AGY traps are unchanged.

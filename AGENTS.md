@@ -13,6 +13,7 @@ This is a **public repo**. No real emails, phone numbers, API keys, internal pat
 - `skills/writing_workflows.md` — root skill / router. This is the single entry point to expose in a workspace skill index.
 - `skills/workflow_external_writing.md` — external-facing writing operational spine (Chinese canonical).
 - `skills/workflow_internal_writing.md` — internal writing workflow (Chinese canonical).
+- `skills/workflow_news_aggregation.md` — news-aggregation channel sub-workflow: information packets + outline + multi-item briefing (Chinese canonical).
 - `skills/bestpractice_external_prose.md` — Manager reference diagnostic vocabulary (not a gate checklist).
 - `skills/reference_writing_thesis_catalog.md` — L1-L8 analytical angles for external article thesis.
 - `skills/external_prose_lint.md` — CLI usage doc.
