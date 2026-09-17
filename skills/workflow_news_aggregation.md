@@ -62,3 +62,10 @@ Run `workflow_external_writing.md` unchanged: five contract artifacts → draft 
 - Creating a second copy of a packet outside the aggregation folder "temporarily"; the copies fork and the folder stops being the source of truth. If a packet must move, move it and delete the source.
 - Forcing a single thesis across items whose strongest theses are independent; the stretched synthesis fails fact discipline on at least one item. Stack instead.
 - The manager mechanical pass quietly becomes a length-editing pass (compressing 6200 → 4500 chars). Length convergence belongs to the outline stage (per-item budget) or a dedicated compression step against the content map, not to the mechanical pass. If convergence happened in stage four, disclose it in the delivery note.
+## Field update (2026-09-16 rewrite session)
+
+Applying the skill surfaced three more traps, recorded here because they all happened:
+
+- **Compression is a separate stage, not Prose QA's job.** The first QA run was asked to both polish prose and cut 7500 → 5000 chars; it did neither well (returned ~7000 chars). The retry that worked split the job: QA received an explicit compression mandate with the content map as the deletion authority ("omit rows must go, optional rows go next, essential rows keep facts but may compress sentences"). Put the compression target and the deletion rules in the QA prompt when the draft overshoots.
+- **Mechanical regex edits on prose leave seams.** Deleting bracket glosses and prefix words left broken parens, doubled prefixes (`接下来关于 X 接下来要盯的`), and a merged code-fence paragraph (`举例：```typescript` on one line). Every regex pass over a finished draft needs a re-read of each edited paragraph plus a lint rerun before gates.
+- **Duplicated signals between section endings and the closing section.** The per-section "what to watch next" endings were written first, then the closing section listed the same signals again. Decide once: either per-section endings or a closing roundup, not both.
