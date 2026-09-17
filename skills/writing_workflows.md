@@ -6,7 +6,7 @@
 - **Use when**: Turning verified research into a finished written artifact. The audience falls into two categories with opposite constraints. Trigger phrases: "write this up", "draft the article", "write a memo", "external-facing article", "internal memo", "survey report".
 - **Root skill**: this file. It routes to focused workflow files inside the repo.
 - **Languages**: Chinese (`skills/`) is canonical; English (`skills_en/`) mirrors it.
-- **Last updated**: 2026-09-10
+- **Last updated**: 2026-09-16
 
 ## What this skill is
 
@@ -17,6 +17,8 @@ Two writing workflows, one shared diagnostic vocabulary, and one deterministic l
 2. **External writing** (`workflow_external_writing.md`) — for readers who lack shared context (the public, clients, course audiences). The goal is a finished analytical article that reads like a practitioner sharing a finding, not a lecturer walking a student through a syllabus. Core technique: three-context separation (editorial / drafting / acceptance), multi-stage full-text rewrite pipeline (`draft.md` → mandatory `rewrite.md` → independent Prose QA `rewrite_final.md` → manager mechanical pass), and dual terminal gates (deterministic prose linter + independent cold read whose machine-extracted verdict blocks "done").
 
 3. **Twitter post writing** (`twitter_post_writing.md`) — channel sub-workflow of external writing: turn a finished article into a distribution tweet (Typefully long post) without inheriting the article's aphorism layer or collapsing into a template. Core technique: single isolated Cursor generation retelling the article in section order (~400 characters) with built-in voice constraints, lint-subset plus tweet-specific mechanical gates, and a fact-fidelity check against the article.
+
+4. **News aggregation writing** (`workflow_news_aggregation.md`) — channel sub-workflow of external writing for recurring multi-item briefings. Three separable operations: pack one research item into a self-contained information packet inside the dated `tmp/news_aggregation_<YYYYMMDD>/` folder (folder located by date, never created; flat layout), discuss the outline with the user (stacked independent items by default; no forced unified theme), and run the external writing pipeline on the agreed outline with per-section fact discipline from each packet.
 
 The two share a voice target (practitioner, not lecturer), a diagnostic vocabulary (`bestpractice_external_prose.md`), a thesis catalog (`reference_writing_thesis_catalog.md`), and a mechanical hygiene CLI (`external_prose_lint.md`).
 
@@ -35,6 +37,7 @@ Before drafting, classify the audience:
 | `workflow_internal_writing.md` | Drafting an internal memo, decision brief, work log | The agent doing the drafting |
 | `workflow_external_writing.md` | Drafting an external-facing article, survey report, course asset | The Main Agent (editorial + acceptance) and the writer conversation (drafting) |
 | `twitter_post_writing.md` | Turning a finished external article into a Twitter distribution post (Typefully long post) | The agent orchestrating publication; the single Cursor generation call |
+| `workflow_news_aggregation.md` | Packing research into information packets, outlining or writing a multi-item news briefing | The agent running any of the three news-aggregation operations |
 | `bestpractice_external_prose.md` | Diagnosing why a candidate draft sounds like a textbook or is cognitively overloaded; writing the `voice_contract.md` | Main Agent only. Never paste into the writer context. Not a gate checklist. |
 | `reference_writing_thesis_catalog.md` | Brainstorming the thesis of an external article; finding the analytical angle | Main Agent during Round 1 (thesis / structure) |
 | `external_prose_lint.md` | Mechanical hygiene self-check on a Chinese external draft | The agent running the lint CLI |
