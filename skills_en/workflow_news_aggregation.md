@@ -30,10 +30,10 @@ A three-operation pipeline for recurring news-briefing production. One session u
 One file per research item. A writer agent reading only this file (plus the URLs it cites) can write that item's section without touching research scratchpads. Required sections:
 
 - Header: one-line purpose statement, packing date, pointer to the upstream memo path.
-- **Source Contract**: every usable fact with its URL and evidence grade (official / tested / community / hearsay / inference). Include the numbers, quotes, and the timeline. No new facts beyond the research.
+- **Source Contract**: every usable fact with its URL. Include the numbers, quotes, and the timeline. No new facts beyond the research.
 - **Writing Brief**: reader start state, single takeaway, thesis candidates, candidate titles.
 - **Fact discipline**: the red lines for this item — what must never be claimed, which vendor numbers need qualifiers, which items are forward-looking or single-source. Copied from the research's fact_check.
-- Optional: evidence-gap list, image suggestion.
+- Optional: image suggestion.
 
 ### Known failure (do not repeat)
 
@@ -53,7 +53,7 @@ Read all packets the user listed, then propose an outline. Rules:
 Run `workflow_external_writing.md` unchanged: five contract artifacts → draft → mandatory rewrite → Prose QA → manager mechanical pass → lint CLI → terminal cold read. Channel-specific adjustments:
 
 - **Audience contract**: reader lacks context on every item; each section must stand alone. Terms introduced in one section do not carry into others.
-- **Voice contract**: opening section names all items with one-line actions (no mechanism terms in the first paragraph); per-section endings state the evidence boundary in 2-4 sentences; the closing section restates items in one line each and may end on an open question only if it is factual.
+- **Voice contract**: opening section names all items with one-line actions (no mechanism terms in the first paragraph); per-section endings close with a factual note; the closing section restates items in one line each and may end on an open question only if it is factual.
 - **Line budget**: the external workflow's spine cap applies to the shared workflow file, not to a generated article. A 4000-5000 character briefing with five to seven H2 sections is normal; the lint CLI's H2-count finding is answered, not silenced: sections are stacked items, so >4 H2s is expected and recorded with that reason.
 - **Length convergence**: if the draft overshoots the user's budget, compress by deleting optional content-map rows, never by taste-rewriting (that belongs to the rewrite stage).
 - **Images**: one mechanism figure is usually enough for a briefing; pixel-style panels per item work better than one giant diagram.

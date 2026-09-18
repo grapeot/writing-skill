@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-09-17 (3)
+
+- Removed evidence-strength narrative from the writing skills (internal + external + news aggregation, Chinese canonical and English mirrors): dropped the "evidence strength / transferability" examples in section 4.2 and the object-layer rationale of `workflow_internal_writing.md`, the verdict-conclusion example phrase in the restatement check, the evidence-grade field in the news-aggregation source contract, the per-section "evidence boundary" endings in its voice contract, and the optional evidence-gap list. Rationale (user decision): evidence grading is already embedded in modern LLM training; restating it in writing rules overemphasizes it. Verifiability itself (in-situ evidence links) is unchanged.
+
 ### 2026-09-17 (2)
 
 - Added a mandatory read-trigger to `skills/workflow_external_writing.md` §7 Delivery (and English mirror): after any article or edit lands on disk, the Main Agent must immediately `read` the full text so the user's client can preview the final version, and state the path in the reply; writing to disk without triggering a read does not count as delivery. Field failure: three successive rewrites of the feedback-engineering article were reported as complete with paths only, and the user could not see the result until explicitly asking for a read. No gate added: one numbered step appended to the existing delivery list.
