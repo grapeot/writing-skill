@@ -7,7 +7,7 @@
 - **前置依赖**：`workflow_deep_research_survey.md` Phase 1-3 或等价事实底稿。
 - **诊断词汇**：`bestpractice_external_prose.md`（Manager 查阅，不是 gate 清单，不进 Writer 上下文）。
 - **机械自查 CLI**：`external_prose_lint.md`（`external_prose_lint_cli.py`）。
-- **最后更新**：2026-09-10
+- **最后更新**：2026-09-17
 
 ## 0. 这个文件的纪律
 
@@ -131,3 +131,4 @@ cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path
 1. 确认归档文件路径清晰。
 2. 用 `view_file` 或 `read` 从开头读取最终 Markdown 进行肉眼检查。
 3. 向用户提供最终文件路径与残余风险说明。
+4. **交付即触发读取**：每次成稿或修改落盘后，Main Agent 必须立即 `read` 一次全文，让用户端能直接预览最终版本，并在回复中给出路径；只在文件系统写完、不触发读取，不算交付。
