@@ -5,7 +5,7 @@
 - **Type**: Workflow
 - **Use case**: For readers who share project context: the author themselves, internal collaborators, AI agents, project workflows. Covers research memos, decision briefs, work logs, and execution summaries.
 - **Created**: 2026-06-11
-- **Last updated**: 2026-08-16
+- **Last updated**: 2026-09-17
 
 ---
 
@@ -99,6 +99,8 @@ The opening screen must let the reader **see and understand** the core conclusio
 
 Leading with the conclusion does not allow leaping over comprehension prerequisites. If a conclusion depends on concepts the reader has not yet encountered, first use one or two sentences of concrete facts, actions, or comparisons to build a minimal comprehension step, then give the conclusion. The background provided here serves only to understand the current judgment and does not constitute a full domain survey.
 
+Distinguish two kinds of conclusions: **comprehension conclusions** (what new understanding of the world the reader gains) and **verdict conclusions** (how trustworthy or valuable the author judges the subject to be). Comprehension conclusions arrive before verdict conclusions. Verdicts depend on understanding: while the reader does not yet know what the subject is, appraisals such as "evidence strength" or "transferability" have no grammatical subject — the reader cannot absorb them.
+
 For complex topics, the first screen defaults to a two-layer expression:
 
 1. **Plain-language layer**: first state who did what, what difference emerged, and which decision this affects. The reader must be able to restate it without knowing any new terminology.
@@ -110,15 +112,16 @@ Technical expression cannot substitute for the plain-language layer. If removing
 
 The reader may be switching between multiple tasks and lack real-time context in their head. Open with 1–2 sentences restoring minimal context: what project this is, what question this round of work answers, and why it needs attention now.
 
-### 4.4 Three-layer expansion of the explanatory body
+### 4.4 Layered expansion of the explanatory body
 
-After the first screen previews the conclusion, the explanatory body defaults to a three-layer expansion, avoiding back-and-forth jumping between layers. These three layers correspond to the presentation order in Section 3, taking the reader from "seeing the problem" to "evaluating the solution":
+After the first screen previews the conclusion, the explanatory body unfolds in layers, avoiding back-and-forth jumping between layers. These layers correspond to the presentation order in Section 3, arranged by comprehension dependency:
 
+0. **Object layer** (required first when the research subject is a mechanism or system unfamiliar to the reader): what the object is, what it concretely does, and how it works. Walk through the operating mechanism in plain language; the acceptance bar is that the reader can retell to a third party "what this thing is." Without this layer, later evaluations and attributions become predicates without a subject — the reader cannot absorb evidence strength or trade-off analysis while still missing a picture of the object itself.
 1. **Problem layer**: how the old system worked, and when it started falling short. Open with a concrete action or failure scenario.
 2. **Solution layer**: which actions or boundaries the new subject concretely changes. First write what it can save, constrain, compare, or recover. Only name the capability when later text needs to reference it repeatedly.
 3. **Decision layer**: how far it has progressed, and what we should do now. Shipped/roadmap boundaries and action recommendations unfold after the problem and solution are understandable.
 
-The first screen may preview the final decision to the reader; shipped/roadmap boundaries and action recommendations in the body should unfold after the problem and solution are already understandable. A decision preview cannot substitute for the explanation provided by the first two layers.
+When the reader is already familiar with the research subject, the object layer merges into the minimal context and the body starts at the problem layer by default. The first screen may preview the final decision, but shipped/roadmap boundaries and action recommendations in the body must unfold only after the problem and solution are established. A decision preview cannot substitute for the explanation provided by the preceding layers.
 
 ### 4.5 Segmented editing for long documents
 
@@ -163,11 +166,11 @@ The skim layer may omit evidentiary detail but must not omit the prerequisites n
 An author who has just finished compressing material will pass every item on their own checklist. This section retains only checks that yield visible artifacts or countable criteria. Complete this in a single read-through; do not run separate passes per checklist item.
 
 1. **Term lag**: When each term, abbreviation, or proper noun first appears, the action, identity, or consequence it names must have already appeared in the preceding text. Understanding any sentence must not require reading later text first. Treat abstract words such as governance, capability, boundary, and efficiency as terms.
-2. **First-screen restatement**: Reading only the first screen, write three sentences: what happened, why it affects the current decision, and what the next step is. These three sentences must be posted alongside the first screen with the deliverable for reader spot-checking; the author must not substitute a self-attested "passed" for posting them. The restatement sentences must not contain any terms, abbreviations, or framework names newly introduced in this round. Opening from the author's final terminology system is the canonical failure mode of this test.
-3. **Three-layer arrival**: The first-screen plain-language layer arrives first. The problem layer (when the old approach fell short), solution layer (what actions changed), and decision layer (current progress, what to do) arrive in comprehension-dependency order without leapfrogging each other.
+2. **First-screen restatement**: Reading only the first screen, write three sentences. For research-subject memos, the first sentence must be a "what it is" restatement (with the bar that the reader can retell it clearly to a third party); the second states what it changes or what the evidence shows; the third is the next step. Work logs and execution summaries keep "what happened, why it affects the current decision, what the next step is." These three sentences must be posted alongside the first screen with the deliverable for reader spot-checking. The author must not substitute a self-attested "passed" for posting them. The restatement sentences must not contain any terms, abbreviations, or framework names newly introduced in this round. Opening from the author's final terminology system, or substituting a verdict conclusion ("how strong is the evidence," "is it trustworthy") for "what it is," is the canonical failure mode of this test.
+3. **Layered arrival**: The first-screen plain-language layer arrives first. The object layer (what it is, how it works), problem layer (when the old approach fell short), solution layer (what actions changed), and decision layer (current progress, what to do) arrive in comprehension-dependency order without leapfrogging each other. While the object remains unestablished, no evaluative sentence may appear ahead of it.
 4. **Question proportion**: Content directly answering the question contract must constitute the majority of the body. If feature lists, timelines, or protocols dominate, restructure the document.
 
-Additional requirement for research and explanatory memos: Before drafting, write the core conclusion in three plain-language sentences containing no newly introduced terms and at most one pair of numerical comparisons. These three sentences constitute the first-screen plain-language layer, not a warm-up exercise to discard after drafting. If at delivery these three sentences describe something different from the post-draft restatement sentences, the first screen has drifted. The core comparison defaults to a single table, with the remainder collapsed into folded sections. Work logs and execution summaries are verified against the multiple contracts in Section 4.1 and do not follow this paragraph.
+Additional requirement for research and explanatory memos: Before drafting, write the core conclusion in three plain-language sentences containing no newly introduced terms and at most one pair of numerical comparisons. When the research subject is an unfamiliar mechanism, the first sentence states "what it is and how it works" — do not open with an evaluative sentence. These three sentences constitute the first-screen plain-language layer, not a warm-up exercise to discard after drafting. If at delivery these three sentences describe something different from the post-draft restatement sentences, the first screen has drifted. The core comparison defaults to a single table, with the remainder collapsed into folded sections. Work logs and execution summaries are verified against the multiple contracts in Section 4.1 and do not follow this paragraph.
 
 Only introduce an out-of-context cold reader to restate the first screen when deliverables are batched and readers cannot spot-check each one. The cold reader must simultaneously receive the list of terms shared prior to this round, judging only whether new concepts introduced in this round have plain-language stepping stones. Cold reading is an escalation mechanism, not a routine exemption path, and must not be framed as an automated machine gate.
 
