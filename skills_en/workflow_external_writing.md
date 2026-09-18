@@ -7,7 +7,7 @@
 - **Prerequisites**: `workflow_deep_research_survey.md` Phase 1-3 or equivalent verified factual record.
 - **Diagnostic vocabulary**: `bestpractice_external_prose.md` (for Manager review; not a gate checklist; never in Writer context).
 - **Mechanical self-check CLI**: `external_prose_lint.md` (`external_prose_lint_cli.py`).
-- **Last updated**: 2026-09-10
+- **Last updated**: 2026-09-17
 
 ## 0. Discipline of This Document
 
@@ -131,3 +131,4 @@ After both gates pass (linter exit 0 + terminal cold read `SHIP`):
 1. Confirm the archive path is clear.
 2. Read final Markdown from the beginning with `view_file` or `read` for a visual check.
 3. Give the user the final file path and residual risk notes.
+4. **Trigger a read on delivery**: every time the article or an edit lands on disk, the Main Agent must immediately `read` the full text so the user's client can preview the final version, and state the file path in the reply. Writing the file to disk without triggering a read does not count as delivery.
