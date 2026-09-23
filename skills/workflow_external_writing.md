@@ -7,7 +7,7 @@
 - **前置依赖**：`workflow_deep_research_survey.md` Phase 1-3 或等价事实底稿。
 - **诊断词汇**：`bestpractice_external_prose.md`（Manager 查阅，不是 gate 清单，不进 Writer 上下文）。
 - **机械自查 CLI**：`external_prose_lint.md`（`external_prose_lint_cli.py`）。
-- **最后更新**：2026-09-17
+- **最后更新**：2026-09-23
 
 ## 0. 这个文件的纪律
 
@@ -20,27 +20,35 @@
 ## 1. 三种工作，不能同一个 context 做
 
 1. **编辑判断**：文章为什么值得写，读者应改变什么认识，证据按什么顺序到达。
-2. **完整成文与管线重写**：把锁定的内容通过结构稿与独立重写变成自然连贯的 prose。
-3. **结果验收**：由机械校验器与独立冷读共同判定事实是否漂移、约束是否满足、声线是否成立。
+2. **完整成文与管线 naturalize 重写**：把锁定的内容通过结构稿与独立 naturalize 重写变成自然连贯的 prose。
+3. **结果验收**：事实是否漂移由重写前后的独立事实核查判定（§4 阶段二/阶段四）；约束是否满足、声线是否成立，由机械校验器与独立冷读共同判定。
 
 Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的判定者**——判定交给看不到 contract 的独立冷读与确定性 CLI。Main Agent 不得凭个人语感点修 Writer 的 prose（错字/数字/路径这类能与 source contract 对照唯一确定的机械修正除外）；需要品味判断的 prose 问题回给管线重跑。
 
-### 1.1 执行载体与上下文隔离约束（Cursor CLI）
+### 1.1 执行载体与上下文隔离约束（Antigravity CLI）
 
-初稿生成、全文重写、Prose QA 与盲读/终端冷读均默认通过 Cursor + Gemini 3.8 Flash High 完成，所有 harness 一致。禁止在 Main Agent 的同一个 context 里局部修正几行冒充重写或冷读。
+初稿生成、naturalize 重写、事实漂移核查与盲读/终端冷读均默认通过 Antigravity + Gemini 3.8 Flash High 完成，所有 harness 一致。禁止在 Main Agent 的同一个 context 里局部修正几行冒充重写或冷读。
 
-先读 [ai-agent-cli 根 skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) 与 [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md)。通用 CLI 技术说明留在那里，本工作流保留任务特定的调用、隔离与超时要求：
+先读 [ai-agent-cli 根 skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) 与 [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md)。通用 CLI 技术说明留在那里，本工作流保留任务特定的调用、隔离与超时要求：
 
 ```bash
-cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path/to/minimal-scratch --output-format json "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact."
+agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact." \
+  --model gemini-3.8-flash-high \
+  --mode accept-edits \
+  --sandbox \
+  --dangerously-skip-permissions \
+  --new-project \
+  --print-timeout 10m \
+  --output-format json \
+  --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- 调用方控制 10 分钟任务超时；quota 错误立即停止，不延长超时或循环重试。
-- 每次调用、每轮重跑均为全新会话，不用 `--resume` / `--continue`。
-- 启动时进程 cwd 与 `--workspace` 必须同时指向该次调用的独立 minimal scratch。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
+- 调用方控制 10 分钟任务超时（外层 wrapper 须高于 AGY 的 `--print-timeout`）；quota 错误立即停止，不延长超时或循环重试。
+- 每次调用、每轮重跑均为全新会话：必须带 `--new-project`，不用 `--continue` / `--conversation`。
+- 启动时进程 cwd 必须指向该次调用的独立 minimal scratch（AGY 没有 `--workspace` flag，project scope 从 cwd 向上解析）。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
 - scratch 仅放该阶段授权输入，以绝对路径引用。
 - 冷读只见正文与极简评测 prompt，不见 brief、contracts、聊天历史、其他工件或全局写作规则。
-- 成功必须同时满足 exit 0、JSON `type: "result"` / `subtype: "success"` / `is_error: false`，以及请求的输出工件非空且读回核验。执行成功不替代写作质量 gate。
+- 成功必须同时满足 exit 0、stdout JSON `status: "SUCCESS"`，以及请求的输出工件非空、实际落在本次 scratch（AGY 裸 `--print` 会继承项目旧会话，产物可能写进旧目录）且读回核验。执行成功不替代写作质量 gate。
 
 ## 2. 输出路由与交付边界
 
@@ -60,28 +68,38 @@ cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path
 - **`source_contract.md`**：事实完整、不含推测。
 - **`writing_brief.md`**：reader start state / takeaway / 精确 thesis / H2 结构规划（4-6 个 `## H2`）/ 候选标题。
 - **`audience_contract.md`**：读者已知与禁止假设的未知概念、单一带走点。
-- **`voice_contract.md`**：姿态范例、目标语气、禁止极性词与低俗套路比喻。
+- **`voice_contract.md`**：目标 register 的具体正面场景化描述（“坐在你旁边”级别：句子像人话、平实具体、不端着；含句子节奏描述——短句落判断、长句连因果、段落呼吸、不说明书式短句连排）；姿态范例（他文正例可保留作参考）；禁止极性词与低俗套路比喻。注意：自指 before→after 样例不写进 contract——它随每篇 draft 不同，由 Manager 在 naturalize 阶段从当次 draft 现场挑选（见 §4 阶段三）。
 - **`content_map.md`**：非线性的证据卡片映射（`body-essential` / `appendix-only` / `omit`）。
 
 ---
 
-## 4. Round 2：多阶段成文管线（基于 AI News Priority Research 协议）
+## 4. Round 2：多阶段成文管线
 
-成文不走“一步到位”或“盲目微调”，而是通过多阶段、独立上下文的传递来消除 AI 腔与教材声：
+成文不走“一步到位”或“盲目微调”，而是通过多阶段、独立上下文的传递来消除 AI 腔与教材声。分工原则：结构稿负责事实与结构；naturalize 重写负责 register，其 prompt 只装单一 voice 目标——两次写作 session 的实测：背着 10-11 项事实修正清单的多目标重写产物均落在报告腔、未过人工审阅，不带清单的单目标 naturalize 产物通过；事实修正在重写前后各有独立机械 pass；文风与陌生读者体感由 §5 双重 gate 判定。
 
 1. **阶段一：结构稿（`draft.md`）**
-   - Main Agent 将 `writing_brief.md`、`content_map.md`、`source_contract.md` 放入阶段专属 minimal scratch，委托独立 Cursor CLI 调用生成结构完整的初稿 `draft.md`，不直接手写正文 prose。
+   - Main Agent 将 `writing_brief.md`、`content_map.md`、`source_contract.md` 放入阶段专属 minimal scratch，委托独立 Antigravity CLI 调用生成结构完整的初稿 `draft.md`，不直接手写正文 prose。
    - 重点是事实保真、概念依赖图建立与 concrete carrier 铺设。
 
-2. **阶段二：强制全文整篇重写（`rewrite.md`）**
-   - **这是不可跳过的必经步骤**（参考 `ai_news_priority_research` 协议）：按 §1.1 另起全新独立 Cursor CLI 会话，读取 `draft.md`、`writing_brief.md` 与 `voice_contract.md`，从头将全文整篇重写到 `rewrite.md`。
-   - 任务核心：在严格保留事实、数字、URL、核心论点与结构的原则下，重新用自然中文的呼吸节奏打碎说明书式的单句段与教材式定义，替换掉行文中的机械连接词，赋予文章同行交流的视角。
+2. **阶段二：Manager draft 事实回查（Main Agent，机械）**
+   - Main Agent 读回 `draft.md`，对照 `source_contract.md` 逐条回查事实、数字、日期、URL 与 claim 强度。能与 source contract 对照唯一确定的机械错误，直接在 `draft.md` 上就地修正（§1 权限边界允许这类机械修正）；需要 claim 强度或结构判断的问题回阶段一重跑或回 brief，不即兴点改。
+   - 本阶段的目的是让 naturalize prompt 不背任何“必须纠正的事实”清单——所有事实问题在重写之前清完。
 
-3. **阶段三：Prose QA（`rewrite_final.md`）**
-   - 按 §1.1 另起全新独立 Cursor CLI 会话审查 `rewrite.md`，修正句子节奏、段落衔接与局部语病，输出 `rewrite_final.md`。不得改变 claim 强度与事实表达。
+3. **阶段三：naturalize 重写（`naturalize.md`，替代原“强制全文整篇重写”）**
+   - **不可跳过的必经步骤**：按 §1.1 另起全新独立 Antigravity CLI 会话，从头将全文重写为平实自然的 prose，写入 `naturalize.md`。
+   - prompt 只装单一 voice 目标（“把全文改写成平实、具体、自然的文风，保留信息与论证顺序”），不装事实修正清单、不装结构改动。
+   - prompt 必须包含：
+     - `voice_contract.md` 的具体正面 register 描述（场景化，“像一个一线工程师坐在你旁边讲”级别，含句子节奏：短句落判断、长句连因果、段落呼吸、不说明书式短句连排）；
+     - 1-3 个自指 before→after 样例（直接写进 prompt）：Manager 从当次 `draft.md` 挑 1-3 句真实病灶句（教材腔/报告腔/翻译腔），为每句写出完整的目标句。样例是 Writer 输入，不是 Main Agent 对成品的 prose 判定，不违反 §1 权限边界；
+     - 硬保留清单：信息与论证顺序、H1/H2 数量与顺序、全部事实/数字/日期/URL/arXiv ID、图片占位符及位置、判断强度、第一人称边界、篇幅容差（±10%）。
+   - 完成动作：写完即结束任务，不自查、不统计字数、不输出额外文件。
 
-4. **阶段四：Manager Mechanical Pass**
-   - Main Agent 读回 `rewrite_final.md`，仅修正能与 source contract 对照唯一确定的机械错误（错字、数字、路径等）。需要品味判断的语气、叙述距离、节奏或措辞问题，交回 Writer / Prose QA，不由 Main Agent 自行改写；遵循 §1 的权限边界。
+4. **阶段四：事实漂移核查 + surgical fix（独立上下文）**
+   - 按 §1.1 另起全新独立上下文（Antigravity CLI 或 subagent），把 `naturalize.md` 逐段对照 `draft.md` 与 `source_contract.md`，列出全部事实漂移（数字、日期、专有名词、URL、判断强度升降、遗漏或新增事实）。
+   - Surgical fix：只把漂移点机械改回 `draft.md` / `source_contract.md` 的表述，不动声线、节奏与结构。漂移过大（整段缺失、结构件缺失、修正需要重写句子）时不就地补——回阶段三重跑同一 prompt（不塞漂移清单，保持单一 voice 目标）；若同一漂移复现，说明问题在上游，回阶段二回查 draft 或阶段一重跑。
+
+5. **阶段五：Manager Mechanical Pass**
+   - Main Agent 读回 naturalize 修订后的全文，仅修正能与 source contract 对照唯一确定的机械错误（错字、数字、路径等）。需要品味判断的语气、叙述距离、节奏或措辞问题，回阶段三/四循环重跑，不由 Main Agent 自行改写；遵循 §1 的权限边界。
 
 ---
 
@@ -105,7 +123,7 @@ cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path
 
 通过 Gate 1 后，执行不可跳过、不可 override 的终端陌生读者冷读：
 
-- **上下文**：按 §1.1 另起全新独立 Cursor CLI 会话，minimal scratch 仅含最终 canonical Markdown 正文与极简评测 prompt，看不到任何 contract、brief、聊天历史、其他工件或全局写作规则。
+- **上下文**：按 §1.1 另起全新独立 Antigravity CLI 会话，minimal scratch 仅含最终 canonical Markdown 正文与极简评测 prompt，看不到任何 contract、brief、聊天历史、其他工件或全局写作规则。
 - **两个输出**：
   1. **读者姿态体感**：作者是在“分享发现的同行”，还是“高高在上的讲师/顾问/规范制定者”？
   2. **无术语复述测试**：能否不用专业术语复述出每一节到底发生了什么。
