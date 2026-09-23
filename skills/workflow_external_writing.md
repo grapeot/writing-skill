@@ -7,7 +7,7 @@
 - **前置依赖**：`workflow_deep_research_survey.md` Phase 1-3 或等价事实底稿。
 - **诊断词汇**：`bestpractice_external_prose.md`（Manager 查阅，不是 gate 清单，不进 Writer 上下文）。
 - **机械自查 CLI**：`external_prose_lint.md`（`external_prose_lint_cli.py`）。
-- **最后更新**：2026-09-17
+- **最后更新**：2026-09-21
 
 ## 0. 这个文件的纪律
 
@@ -25,22 +25,30 @@
 
 Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的判定者**——判定交给看不到 contract 的独立冷读与确定性 CLI。Main Agent 不得凭个人语感点修 Writer 的 prose（错字/数字/路径这类能与 source contract 对照唯一确定的机械修正除外）；需要品味判断的 prose 问题回给管线重跑。
 
-### 1.1 执行载体与上下文隔离约束（Cursor CLI）
+### 1.1 执行载体与上下文隔离约束（Antigravity CLI）
 
-初稿生成、全文重写、Prose QA 与盲读/终端冷读均默认通过 Cursor + Gemini 3.8 Flash High 完成，所有 harness 一致。禁止在 Main Agent 的同一个 context 里局部修正几行冒充重写或冷读。
+初稿生成、全文重写、Prose QA 与盲读/终端冷读均默认通过 Antigravity + Gemini 3.8 Flash High 完成，所有 harness 一致。禁止在 Main Agent 的同一个 context 里局部修正几行冒充重写或冷读。
 
-先读 [ai-agent-cli 根 skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) 与 [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md)。通用 CLI 技术说明留在那里，本工作流保留任务特定的调用、隔离与超时要求：
+先读 [ai-agent-cli 根 skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) 与 [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md)。通用 CLI 技术说明留在那里，本工作流保留任务特定的调用、隔离与超时要求：
 
 ```bash
-cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path/to/minimal-scratch --output-format json "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact."
+agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact." \
+  --model gemini-3.8-flash-high \
+  --mode accept-edits \
+  --sandbox \
+  --dangerously-skip-permissions \
+  --new-project \
+  --print-timeout 10m \
+  --output-format json \
+  --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- 调用方控制 10 分钟任务超时；quota 错误立即停止，不延长超时或循环重试。
-- 每次调用、每轮重跑均为全新会话，不用 `--resume` / `--continue`。
-- 启动时进程 cwd 与 `--workspace` 必须同时指向该次调用的独立 minimal scratch。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
+- 调用方控制 10 分钟任务超时（外层 wrapper 须高于 AGY 的 `--print-timeout`）；quota 错误立即停止，不延长超时或循环重试。
+- 每次调用、每轮重跑均为全新会话：必须带 `--new-project`，不用 `--continue` / `--conversation`。
+- 启动时进程 cwd 必须指向该次调用的独立 minimal scratch（AGY 没有 `--workspace` flag，project scope 从 cwd 向上解析）。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
 - scratch 仅放该阶段授权输入，以绝对路径引用。
 - 冷读只见正文与极简评测 prompt，不见 brief、contracts、聊天历史、其他工件或全局写作规则。
-- 成功必须同时满足 exit 0、JSON `type: "result"` / `subtype: "success"` / `is_error: false`，以及请求的输出工件非空且读回核验。执行成功不替代写作质量 gate。
+- 成功必须同时满足 exit 0、stdout JSON `status: "SUCCESS"`，以及请求的输出工件非空、实际落在本次 scratch（AGY 裸 `--print` 会继承项目旧会话，产物可能写进旧目录）且读回核验。执行成功不替代写作质量 gate。
 
 ## 2. 输出路由与交付边界
 
@@ -70,15 +78,15 @@ cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path
 成文不走“一步到位”或“盲目微调”，而是通过多阶段、独立上下文的传递来消除 AI 腔与教材声：
 
 1. **阶段一：结构稿（`draft.md`）**
-   - Main Agent 将 `writing_brief.md`、`content_map.md`、`source_contract.md` 放入阶段专属 minimal scratch，委托独立 Cursor CLI 调用生成结构完整的初稿 `draft.md`，不直接手写正文 prose。
+   - Main Agent 将 `writing_brief.md`、`content_map.md`、`source_contract.md` 放入阶段专属 minimal scratch，委托独立 Antigravity CLI 调用生成结构完整的初稿 `draft.md`，不直接手写正文 prose。
    - 重点是事实保真、概念依赖图建立与 concrete carrier 铺设。
 
 2. **阶段二：强制全文整篇重写（`rewrite.md`）**
-   - **这是不可跳过的必经步骤**（参考 `ai_news_priority_research` 协议）：按 §1.1 另起全新独立 Cursor CLI 会话，读取 `draft.md`、`writing_brief.md` 与 `voice_contract.md`，从头将全文整篇重写到 `rewrite.md`。
+   - **这是不可跳过的必经步骤**（参考 `ai_news_priority_research` 协议）：按 §1.1 另起全新独立 Antigravity CLI 会话，读取 `draft.md`、`writing_brief.md` 与 `voice_contract.md`，从头将全文整篇重写到 `rewrite.md`。
    - 任务核心：在严格保留事实、数字、URL、核心论点与结构的原则下，重新用自然中文的呼吸节奏打碎说明书式的单句段与教材式定义，替换掉行文中的机械连接词，赋予文章同行交流的视角。
 
 3. **阶段三：Prose QA（`rewrite_final.md`）**
-   - 按 §1.1 另起全新独立 Cursor CLI 会话审查 `rewrite.md`，修正句子节奏、段落衔接与局部语病，输出 `rewrite_final.md`。不得改变 claim 强度与事实表达。
+   - 按 §1.1 另起全新独立 Antigravity CLI 会话审查 `rewrite.md`，修正句子节奏、段落衔接与局部语病，输出 `rewrite_final.md`。不得改变 claim 强度与事实表达。
 
 4. **阶段四：Manager Mechanical Pass**
    - Main Agent 读回 `rewrite_final.md`，仅修正能与 source contract 对照唯一确定的机械错误（错字、数字、路径等）。需要品味判断的语气、叙述距离、节奏或措辞问题，交回 Writer / Prose QA，不由 Main Agent 自行改写；遵循 §1 的权限边界。
@@ -105,7 +113,7 @@ cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path
 
 通过 Gate 1 后，执行不可跳过、不可 override 的终端陌生读者冷读：
 
-- **上下文**：按 §1.1 另起全新独立 Cursor CLI 会话，minimal scratch 仅含最终 canonical Markdown 正文与极简评测 prompt，看不到任何 contract、brief、聊天历史、其他工件或全局写作规则。
+- **上下文**：按 §1.1 另起全新独立 Antigravity CLI 会话，minimal scratch 仅含最终 canonical Markdown 正文与极简评测 prompt，看不到任何 contract、brief、聊天历史、其他工件或全局写作规则。
 - **两个输出**：
   1. **读者姿态体感**：作者是在“分享发现的同行”，还是“高高在上的讲师/顾问/规范制定者”？
   2. **无术语复述测试**：能否不用专业术语复述出每一节到底发生了什么。

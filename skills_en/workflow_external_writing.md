@@ -7,7 +7,7 @@
 - **Prerequisites**: `workflow_deep_research_survey.md` Phase 1-3 or equivalent verified factual record.
 - **Diagnostic vocabulary**: `bestpractice_external_prose.md` (for Manager review; not a gate checklist; never in Writer context).
 - **Mechanical self-check CLI**: `external_prose_lint.md` (`external_prose_lint_cli.py`).
-- **Last updated**: 2026-09-17
+- **Last updated**: 2026-09-21
 
 ## 0. Discipline of This Document
 
@@ -25,22 +25,30 @@ To address textbook voice and AI tone, this workflow adopts a **multi-stage mand
 
 The Main Agent is editor, fact owner, and final acceptance authority, but **not the judge of prose**. That judgment belongs to independent cold reads that cannot see contracts and the deterministic CLI. The Main Agent may not touch up Writer prose by personal feel (except mechanical fixes uniquely determined against the source contract: typos, numbers, paths). Prose issues requiring taste judgment return to the pipeline.
 
-### 1.1 Execution and Context Isolation (Cursor CLI)
+### 1.1 Execution and Context Isolation (Antigravity CLI)
 
-Initial drafting, full rewrite, Prose QA, and blind/terminal cold reads default to Cursor + Gemini 3.8 Flash High across all harnesses. Do not edit a few lines in the Main Agent's context to simulate a rewrite or cold read.
+Initial drafting, full rewrite, Prose QA, and blind/terminal cold reads default to Antigravity + Gemini 3.8 Flash High across all harnesses. Do not edit a few lines in the Main Agent's context to simulate a rewrite or cold read.
 
-First read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md). General CLI mechanics stay there; this workflow retains task-specific invocation, isolation, and timeout requirements:
+First read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md). General CLI mechanics stay there; this workflow retains task-specific invocation, isolation, and timeout requirements:
 
 ```bash
-cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path/to/minimal-scratch --output-format json "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact."
+agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact." \
+  --model gemini-3.8-flash-high \
+  --mode accept-edits \
+  --sandbox \
+  --dangerously-skip-permissions \
+  --new-project \
+  --print-timeout 10m \
+  --output-format json \
+  --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- The caller controls a 10-minute task timeout; quota errors stop immediately without extending timeout or retrying in loops.
-- Every call and rerun starts a fresh session, never `--resume` / `--continue`.
-- At launch, process cwd AND `--workspace` must both point to that call's dedicated minimal scratch. The caller must not load parent-workspace rules or global writing rules into the child; a separate directory is not an automatic rule shield.
+- The caller controls a 10-minute task timeout (outer wrapper higher than AGY's `--print-timeout`); quota errors stop immediately without extending timeout or retrying in loops.
+- Every call and rerun starts a fresh session: pass `--new-project`, never `--continue` / `--conversation`.
+- At launch, process cwd must point at that call's dedicated minimal scratch (AGY has no `--workspace` flag; project scope resolves by walking up from cwd). The caller must not load parent-workspace rules or global writing rules into the child; a separate directory is not an automatic rule shield.
 - Scratch contains only authorized inputs for that stage, referenced via absolute paths.
 - Cold reads receive only the body and a minimal evaluation prompt, never briefs, contracts, chat history, other artifacts, or global writing rules.
-- Success requires exit 0 AND JSON `type: "result"` / `subtype: "success"` / `is_error: false` AND the requested non-empty output artifact verified by readback. Execution success does not replace writing quality gates.
+- Success requires exit 0 AND stdout JSON `status: "SUCCESS"` AND the requested non-empty output artifact actually landed in this scratch (a bare AGY `--print` inherits the project's old conversation and can write into an old directory) AND verified by readback. Execution success does not replace writing quality gates.
 
 ## 2. Output Routing and Delivery Boundaries
 
@@ -70,15 +78,15 @@ Restate what already exists in the initial request before drafting or proposing 
 Drafting avoids one-shot generation or blind tweaking; independent contexts across stages address AI tone and textbook voice:
 
 1. **Stage 1: Structural draft (`draft.md`)**
-   - The Main Agent puts `writing_brief.md`, `content_map.md`, and `source_contract.md` into stage-specific minimal scratch, delegating to an independent Cursor CLI session to generate a structurally complete `draft.md`, rather than writing prose directly.
+   - The Main Agent puts `writing_brief.md`, `content_map.md`, and `source_contract.md` into stage-specific minimal scratch, delegating to an independent Antigravity CLI session to generate a structurally complete `draft.md`, rather than writing prose directly.
    - Focus: factual fidelity, concept dependency graph, and concrete carriers.
 
 2. **Stage 2: Mandatory full-article rewrite (`rewrite.md`)**
-   - **Non-skippable step** (per `ai_news_priority_research`): a fresh independent Cursor CLI session per Section 1.1 reads `draft.md`, `writing_brief.md`, and `voice_contract.md`, rewriting the entire piece from scratch into `rewrite.md`.
+   - **Non-skippable step** (per `ai_news_priority_research`): a fresh independent Antigravity CLI session per Section 1.1 reads `draft.md`, `writing_brief.md`, and `voice_contract.md`, rewriting the entire piece from scratch into `rewrite.md`.
    - Strictly preserve facts, numbers, URLs, core claims, and structure. Use natural Chinese rhythm to break up manual-like single-sentence paragraphs and textbook definitions, replace mechanical connectors, and establish a practitioner-to-peer perspective.
 
 3. **Stage 3: Prose QA (`rewrite_final.md`)**
-   - A fresh independent Cursor CLI session per Section 1.1 reviews `rewrite.md`, correcting sentence rhythm, transitions, and local language errors into `rewrite_final.md`. It must not alter claim strength or factual statements.
+   - A fresh independent Antigravity CLI session per Section 1.1 reviews `rewrite.md`, correcting sentence rhythm, transitions, and local language errors into `rewrite_final.md`. It must not alter claim strength or factual statements.
 
 4. **Stage 4: Manager Mechanical Pass**
    - The Main Agent reads back `rewrite_final.md`, fixing only mechanical errors uniquely determined against the source contract (typos, numbers, paths). Tone, narrative distance, rhythm, or wording issues requiring taste judgment return to Writer / Prose QA, not Main Agent rewriting; follow Section 1's authority boundary.
@@ -105,7 +113,7 @@ Actually run the deterministic scanner in the terminal:
 
 After Gate 1, run a non-skippable, non-overridable terminal cold read:
 
-- **Context**: a fresh independent Cursor CLI session per Section 1.1; minimal scratch contains only final canonical Markdown body and a minimal evaluation prompt, never contracts, briefs, chat history, other artifacts, or global writing rules.
+- **Context**: a fresh independent Antigravity CLI session per Section 1.1; minimal scratch contains only final canonical Markdown body and a minimal evaluation prompt, never contracts, briefs, chat history, other artifacts, or global writing rules.
 - **Two outputs**:
   1. **Perceived author-reader relationship**: a peer sharing findings, or a lecturer/consultant/standards-setter speaking from above?
   2. **Jargon-free retelling test**: can the reader retell what happened in each section without technical terms?
