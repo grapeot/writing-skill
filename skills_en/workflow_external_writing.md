@@ -7,7 +7,7 @@
 - **Prerequisites**: `workflow_deep_research_survey.md` Phase 1-3 or equivalent verified factual record.
 - **Diagnostic vocabulary**: `bestpractice_external_prose.md` (for Manager review; not a gate checklist; never in Writer context).
 - **Mechanical self-check CLI**: `external_prose_lint.md` (`external_prose_lint_cli.py`).
-- **Last updated**: 2026-09-21
+- **Last updated**: 2026-09-23
 
 ## 0. Discipline of This Document
 
@@ -20,14 +20,14 @@ To address textbook voice and AI tone, this workflow adopts a **multi-stage mand
 ## 1. Three Kinds of Work That Cannot Share One Context
 
 1. **Editorial judgment**: why the article is worth writing, what readers should rethink, and in what order evidence arrives.
-2. **Full drafting and pipeline rewrite**: turning locked content into natural, coherent prose via a structural draft and independent rewrite.
-3. **Acceptance**: mechanical validation and independent cold read jointly determine fact drift, constraint satisfaction, and whether the voice holds.
+2. **Complete article and pipeline naturalize rewrite**: turning locked content into natural, coherent prose via a structural draft and independent naturalize rewrite.
+3. **Acceptance**: fact drift is judged by the independent fact checks before and after the rewrite (§4 Stage 2 / Stage 4); constraints and voice are jointly judged by the mechanical linter and the independent cold read.
 
 The Main Agent is editor, fact owner, and final acceptance authority, but **not the judge of prose**. That judgment belongs to independent cold reads that cannot see contracts and the deterministic CLI. The Main Agent may not touch up Writer prose by personal feel (except mechanical fixes uniquely determined against the source contract: typos, numbers, paths). Prose issues requiring taste judgment return to the pipeline.
 
 ### 1.1 Execution and Context Isolation (Antigravity CLI)
 
-Initial drafting, full rewrite, Prose QA, and blind/terminal cold reads default to Antigravity + Gemini 3.8 Flash High across all harnesses. Do not edit a few lines in the Main Agent's context to simulate a rewrite or cold read.
+Draft generation, naturalize rewrite, fact drift check, and blind/terminal cold reads default to Antigravity + Gemini 3.8 Flash High across all harnesses. Do not edit a few lines in the Main Agent's context to simulate a rewrite or cold read.
 
 First read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md). General CLI mechanics stay there; this workflow retains task-specific invocation, isolation, and timeout requirements:
 
@@ -68,28 +68,38 @@ Restate what already exists in the initial request before drafting or proposing 
 - **`source_contract.md`**: complete facts, no speculation.
 - **`writing_brief.md`**: reader start state / takeaway / exact thesis / H2 structure plan (4-6 `## H2` headings) / candidate titles.
 - **`audience_contract.md`**: what readers know and what must not be assumed, single takeaway.
-- **`voice_contract.md`**: stance examples, target tone, banned polar wording and cheap stock metaphors.
+- **`voice_contract.md`**: concrete positive, scene-level description of the target register ("sitting next to you" grade: plain, concrete, not putting on airs; includes sentence rhythm descriptions: short sentences land judgments, long sentences connect causality, paragraph breathing, no manual-style single-sentence-paragraph strings); stance examples (other-article positive excerpts may remain as reference); banned polar words and cheap clichéd metaphors. Note: self-referential before→after exemplars do NOT go into the contract — they vary per draft and are picked on the spot by the Manager from the current draft at the naturalize stage (see §4 Stage 3).
 - **`content_map.md`**: non-linear evidence cards (`body-essential` / `appendix-only` / `omit`).
 
 ---
 
-## 4. Round 2: Multi-Stage Drafting Pipeline (AI News Priority Research Protocol)
+## 4. Round 2: Multi-Stage Drafting Pipeline
 
-Drafting avoids one-shot generation or blind tweaking; independent contexts across stages address AI tone and textbook voice:
+Drafting avoids one-shot generation or blind tweaking; independent contexts across stages address AI tone and textbook voice. Division of labor: the structural draft carries facts and structure; the naturalize rewrite carries the register, and its prompt holds a single voice goal only. Measured across two writing sessions: multi-goal rewrite prompts carrying a 10-11 item fact-correction list all landed in report register and failed human review, while single-goal naturalize runs without the list passed; fact correction has its own mechanical passes before and after the rewrite; style and stranger-reader feel are judged by the §5 dual gates.
 
 1. **Stage 1: Structural draft (`draft.md`)**
    - The Main Agent puts `writing_brief.md`, `content_map.md`, and `source_contract.md` into stage-specific minimal scratch, delegating to an independent Antigravity CLI session to generate a structurally complete `draft.md`, rather than writing prose directly.
    - Focus: factual fidelity, concept dependency graph, and concrete carriers.
 
-2. **Stage 2: Mandatory full-article rewrite (`rewrite.md`)**
-   - **Non-skippable step** (per `ai_news_priority_research`): a fresh independent Antigravity CLI session per Section 1.1 reads `draft.md`, `writing_brief.md`, and `voice_contract.md`, rewriting the entire piece from scratch into `rewrite.md`.
-   - Strictly preserve facts, numbers, URLs, core claims, and structure. Use natural Chinese rhythm to break up manual-like single-sentence paragraphs and textbook definitions, replace mechanical connectors, and establish a practitioner-to-peer perspective.
+2. **Stage 2: Manager draft fact check (Main Agent, mechanical)**
+   - The Main Agent reads back `draft.md` and checks facts, numbers, dates, URLs, and claim strength against `source_contract.md` item by item. Mechanical errors uniquely determined against the source contract are fixed in place in `draft.md` (the §1 permission boundary allows this kind of mechanical correction); issues requiring claim-strength or structural judgment go back to Stage 1 for a rerun or back to the brief — no ad-hoc spot edits.
+   - Purpose of this stage: the naturalize prompt carries no "facts that must be corrected" list — all fact issues are settled before the rewrite.
 
-3. **Stage 3: Prose QA (`rewrite_final.md`)**
-   - A fresh independent Antigravity CLI session per Section 1.1 reviews `rewrite.md`, correcting sentence rhythm, transitions, and local language errors into `rewrite_final.md`. It must not alter claim strength or factual statements.
+3. **Stage 3: naturalize rewrite (`naturalize.md`)**
+   - **Non-skippable mandatory step**: per §1.1, a fresh independent Antigravity CLI session rewrites the entire article from scratch into plain, natural prose, written to `naturalize.md`.
+   - The prompt holds a single voice goal only ("rewrite the whole article into plain, concrete, natural prose, preserving information and argument order") — no fact-correction list, no structural changes.
+   - The prompt must include:
+     - the concrete positive register description from `voice_contract.md` (scene-level, "like a frontline engineer sitting next to you" grade, including sentence rhythm: short sentences land judgments, long sentences connect causality, paragraph breathing, no manual-style single-sentence-paragraph strings);
+     - 1-3 self-referential before→after exemplars (written directly into the prompt): the Manager picks 1-3 real symptomatic sentences from the current `draft.md` (textbook register / report register / translationese) and writes a complete target sentence for each. The exemplars are Writer input, not Main Agent prose judgment on the finished article, and do not violate the §1 permission boundary;
+     - the hard-preservation list: information and argument order, H1/H2 count and order, all facts/numbers/dates/URLs/arXiv IDs, image placeholders and their positions, judgment strength, first-person boundary, length tolerance (±10%).
+   - Completion action: end the task immediately after writing — no self-checks, no word counting, no extra files.
 
-4. **Stage 4: Manager Mechanical Pass**
-   - The Main Agent reads back `rewrite_final.md`, fixing only mechanical errors uniquely determined against the source contract (typos, numbers, paths). Tone, narrative distance, rhythm, or wording issues requiring taste judgment return to Writer / Prose QA, not Main Agent rewriting; follow Section 1's authority boundary.
+4. **Stage 4: fact drift check + surgical fix (independent context)**
+   - Per §1.1, a fresh independent context (Antigravity CLI or subagent) compares `naturalize.md` paragraph by paragraph against `draft.md` and `source_contract.md`, and lists every factual drift (numbers, dates, proper nouns, URLs, judgment-strength changes, missing or added facts).
+   - Surgical fix: mechanically revert only the drifted spots to the wording of `draft.md` / `source_contract.md`; do not touch voice, rhythm, or structure. If drift is too large (a whole paragraph missing, a structural element missing, or the fix requires rewriting a sentence), do not patch in place — rerun Stage 3 with the same prompt (no drift list, keep the single voice goal); if the same drift recurs, the problem is upstream — go back to Stage 2 to re-check the draft or Stage 1 for a rerun.
+
+5. **Stage 5: Manager Mechanical Pass**
+   - The Main Agent reads back the full article after the naturalize revision and fixes only mechanical errors uniquely determined against the source contract (typos, numbers, paths, etc.). Issues of tone, narrative distance, rhythm, or wording requiring taste judgment go back to the Stage 3/4 loop for a rerun — the Main Agent does not rewrite them personally; follow the §1 permission boundary.
 
 ---
 
