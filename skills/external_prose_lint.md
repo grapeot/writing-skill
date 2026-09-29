@@ -16,7 +16,7 @@
 
 ## 何时不用
 
-- 教材声、起承转合、认识运动、认知负荷——仍走 blind read / cognitive walkthrough / 终端冷读
+- 教材声、起承转合、认识运动、认知负荷——仍然用 blind read / cognitive walkthrough / 终端冷读
 - 事实是否与 source_contract 一致——对照 contract，不靠本 CLI
 
 ## 命令
@@ -31,7 +31,7 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on any
 python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on never
 ```
 
-安装后即可运行（`uv pip install -e .`）。
+安装后就可以直接运行（`uv pip install -e .`）。
 
 退出码：`0` 无 hard finding（默认）；`1` 有 hard finding；`2` 文件错误。
 
@@ -56,7 +56,7 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `bei_passive` | `被…` 候选 | REVIEW |
 | `char_count` | 汉字字数 | INFO |
 
-每条 finding 的 `Rule / Question` 来自 `COMMUNICATION.md`、`bestpractice_external_prose.md`、`workflow_external_writing.md` 与近两周 Antigravity/OpenCode 写作纠正的稳定 pattern。
+每条 finding 的 `Rule / Question` 来自 `COMMUNICATION.md`、`bestpractice_external_prose.md`、`workflow_external_writing.md` 和近两周 Antigravity/OpenCode 写作纠正的稳定 pattern。
 
 ## Agent 用法（强制）
 

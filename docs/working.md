@@ -4,6 +4,7 @@
 
 ### 2026-09-29
 
+- Rewrote the Chinese prose of the external-writing skill files (`workflow_external_writing.md`, `bestpractice_external_prose.md`, `reference_writing_thesis_catalog.md`, `external_prose_lint.md`) with the author-voice model (voice-lora v1.1), then checked every rewritten paragraph for fact drift, broken formatting, consistency and flow. Of 75 rewritten blocks, 24 were kept (8 with local fixes) and the rest reverted to the original. Main reasons for reverting: example sentences of AI prose were "fixed" by the model, destroying the examples; inline-code backticks were dropped; list markers or headings were invented; first-person voice crept in ("我个人认为"); the meaning shifted ("按 §1.1" became "在 §1.1 中", "thesis" became "论文的主题", "一味升级" lost "一味"). `workflow_news_aggregation.md` is English and was left as is; English mirrors needed no change because meaning is unchanged. Line counts are unchanged (spine stays at 160).
 - Added an optional final step to `skills/workflow_external_writing.md` (§5.3, and English mirror): after Gate 2 `SHIP`, if the workspace has the `voice-lora-rewrite` skill (github.com/grapeot/voice-lora) and its service is reachable, rewrite the canonical Markdown paragraph by paragraph in the author's voice; otherwise skip and say so at delivery. It does not replace Stage 3 naturalize (a field test confirmed naturalize is still needed). The Main Agent then compares every paragraph for fact drift, broken formatting, cross-paragraph consistency and flow, reverts only the problem spots to the pre-rewrite wording, and reruns Gate 1. One-in-one-out: merged the §0 pipeline overview into the gate paragraph, two adjacent §1.1 bullets, the §2 illustration bullet, and the duplicate "read the final Markdown" items in §7; the spine is back to 160 lines.
 
 ### 2026-09-17 (3)
@@ -67,6 +68,8 @@
 - Prepared for privacy review, GitHub repo creation, and migration of the two context-infrastructure repos.
 
 ## Lessons Learned
+
+- Rewriting a style guide with a style model is risky exactly where the guide quotes bad prose: the model "fixes" negative examples. Treat example sentences, quoted patterns and inline code as frozen, and check every rewritten block against the original before keeping it.
 
 - A mirror that still teaches a different generation pipeline remains contradictory even after its CLI names are updated. Review stage order and input scopes against the canonical workflow, not just runner names. A minimal scratch directory is not an automatic rule shield: set both cwd and `--workspace`, and do not forward parent-workspace or global writing rules to the child.
 
