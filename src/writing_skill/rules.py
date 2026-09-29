@@ -18,6 +18,9 @@ CHECK_ORDER = [
     "single_sentence_paragraph",
     "embedded_links",
     "bare_url",
+    "english_density",
+    "repeated_url",
+    "domain_anchor",
     "h2_count",
     "title_book_marks",
     "bei_passive",
@@ -155,6 +158,22 @@ RULES: dict[str, str] = {
         "对外文章要求至少有 3 个以上的行内嵌入链接。\n"
         "→ 当前正文 Markdown 行内链接少于 3 个，请从 source_contract 补充正文行内嵌入链接。"
     ),
+    "english_density": (
+        "用户纠正：正文是中文文章。单段英文词过多，说明英文引文墙压过了中文判断。"
+        "长英文引文压成中文转述 + 短引文（一句话以内、承重才留）；英文术语首次出现给中文称呼，后续统一用中文；"
+        "品牌名、通用借词（token、PR）、文件名可以保留英文。\n"
+        "→ 下列段落能否把英文压成中文转述 + 短引文？"
+    ),
+    "repeated_url": (
+        "用户纠正：同一来源 URL 只在首次出现时给嵌入链接，之后用文字指代（更新日志 / 论坛帖 / 官方文档），"
+        "完整 URL 收进文末来源清单；重复挂链接读起来像脚注堆砌。首现 1 次 + 文末来源清单 1 次是允许的上限。\n"
+        "→ 下列重复出现的链接能否改成文字指代？"
+    ),
+    "domain_anchor": (
+        "用户纠正：所有链接用嵌入形式 `[中文标签](url)`，锚文本是中文标签或判断句；"
+        "不用域名或 URL 当锚文本（`[cursor.com/blog/x](...)` 读起来就是贴了个 URL）。\n"
+        "→ 下列链接的锚文本能否改成中文标签或判断句，如 [官方发布博客](url)？"
+    ),
     "bare_url": (
         "external writing：来源应写成 `[锚文本](url)` embedded link，避免正文裸 URL。\n"
         "→ 下列裸 URL 能否改成带锚文本的 Markdown 链接？"
@@ -221,6 +240,12 @@ NUMBER_TOKEN_RE = re.compile(
 NUMBER_DENSITY_PARA_MIN_NUMBERS = 6  # single paragraph with >= 6 numbers → candidate
 NUMBER_DENSITY_WINDOW_PARAS = 2  # >= 2 consecutive prose paragraphs
 NUMBER_DENSITY_WINDOW_MIN_NUMBERS = 3  # each with >= 3 numbers
+
+# English density / link discipline (REVIEW-level)
+ENGLISH_WORD_RE = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
+ENGLISH_DENSITY_THRESHOLD = 20  # English words in one prose paragraph, link URLs excluded
+REPEATED_URL_THRESHOLD = 2  # first inline mention + one entry in the closing source list
+DOMAIN_ANCHOR_RE = re.compile(r"[A-Za-z0-9.-]+\.[a-z]{2,}(/[^\s)]*)?", re.IGNORECASE)
 
 H1_RE = re.compile(r"^#\s+(.+)$", re.M)
 H2_RE = re.compile(r"^##\s+(.+)$", re.M)

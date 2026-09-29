@@ -12,6 +12,10 @@ from writing_skill.rules import (
     BRACKET_GLOSS_RE,
     CJK_RE,
     CODE_FENCE_RE,
+    DOMAIN_ANCHOR_RE,
+    ENGLISH_DENSITY_THRESHOLD,
+    ENGLISH_WORD_RE,
+    REPEATED_URL_THRESHOLD,
     EM_DASH_RE,
     EVAL_LABEL_RE,
     FRONT_MATTER_RE,
@@ -413,6 +417,63 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
         )
     )
 
+    # english density: English words per prose paragraph, link text and URLs excluded
+    english_words = 0
+    english_hits: list[Hit] = []
+    for start_line, block in all_prose_paras:
+        words = ENGLISH_WORD_RE.findall(MD_LINK_RE.sub("", block))
+        english_words += len(words)
+        if len(words) > ENGLISH_DENSITY_THRESHOLD:
+            first = block.strip().splitlines()[0]
+            english_hits.append(Hit(adj_line(start_line), f"{len(words)} 个英文词: {first[:50]}"))
+    checks.append(
+        CheckResult(
+            id="english_density",
+            count=len(english_hits),
+            hits=english_hits[:20],
+            hard=False,
+            rule=RULES["english_density"],
+            note=f"单段英文词 >{ENGLISH_DENSITY_THRESHOLD}（链接不计）",
+        )
+    )
+
+    # repeated URLs: every occurrence after the first, when a URL appears more than the allowed times
+    url_lines: dict[str, list[int]] = {}
+    for m in md_links:
+        url_lines.setdefault(m.group(2).strip(), []).append(_line_of(scan, m.start()))
+    for m in bare_filtered:
+        url_lines.setdefault(m.group(0), []).append(_line_of(scan, m.start()))
+    repeated_hits: list[Hit] = []
+    for url, lines in url_lines.items():
+        if len(lines) > REPEATED_URL_THRESHOLD:
+            repeated_hits += [Hit(adj_line(ln), f"{url}（全文出现 {len(lines)} 次）") for ln in lines[1:]]
+    checks.append(
+        CheckResult(
+            id="repeated_url",
+            count=len(repeated_hits),
+            hits=repeated_hits[:20],
+            hard=False,
+            rule=RULES["repeated_url"],
+            note=f"同一 URL >{REPEATED_URL_THRESHOLD} 次",
+        )
+    )
+
+    # domain-shaped anchors: [cursor.com/blog/x](url)
+    domain_hits = [
+        Hit(adj_line(_line_of(scan, m.start())), _snippet(scan, m.start(), min(m.end(), m.start() + 60)))
+        for m in md_links
+        if DOMAIN_ANCHOR_RE.fullmatch(m.group(1).strip())
+    ]
+    checks.append(
+        CheckResult(
+            id="domain_anchor",
+            count=len(domain_hits),
+            hits=domain_hits[:20],
+            hard=False,
+            rule=RULES["domain_anchor"],
+        )
+    )
+
     # h2
     h2s = list(H2_RE.finditer(body))
     checks.append(
@@ -479,6 +540,7 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
         "quotes": len(q_all),
         "single_sentence_paragraphs": ssp_count,
         "number_density_paragraphs": len(density_paras),
+        "english_words": english_words,
         "findings": 0,
         "hard_findings": 0,
     }

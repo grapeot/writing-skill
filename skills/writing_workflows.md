@@ -14,9 +14,9 @@ Two writing workflows, one shared diagnostic vocabulary, and one deterministic l
 
 1. **Internal writing** (`workflow_internal_writing.md`) — for readers who already share the project context (the author, collaborators, AI agents, project workflows). The goal is decision friction reduction: maximize actionable judgment per unit of attention. Core technique: bottom-line-up-front, concept ordering (action → difference → impact → name), skimmability, verifiability, adaptive reading paths.
 
-2. **External writing** (`workflow_external_writing.md`) — for readers who lack shared context (the public, clients, course audiences). The goal is a finished analytical article that reads like a practitioner sharing a finding, not a lecturer walking a student through a syllabus. Core technique: three-context separation (editorial / drafting / acceptance), multi-stage full-text rewrite pipeline (`draft.md` → mandatory `rewrite.md` → independent Prose QA `rewrite_final.md` → manager mechanical pass), and dual terminal gates (deterministic prose linter + independent cold read whose machine-extracted verdict blocks "done").
+2. **External writing** (`workflow_external_writing.md`) — for readers who lack shared context (the public, clients, course audiences). The goal is a finished analytical article that reads like a practitioner sharing a finding, not a lecturer walking a student through a syllabus. Core technique: three-context separation (editorial / drafting / acceptance), multi-stage full-text rewrite pipeline (structure draft `draft.md` → manager fact check → mandatory naturalize rewrite `naturalize.md` → independent fact-drift check → manager mechanical pass), an optional final author-voice rewrite when the `voice-lora-rewrite` skill is available, and dual terminal gates (deterministic prose linter + independent cold read whose machine-extracted verdict blocks "done").
 
-3. **Twitter post writing** (`twitter_post_writing.md`) — channel sub-workflow of external writing: turn a finished article into a distribution tweet (Typefully long post) without inheriting the article's aphorism layer or collapsing into a template. Core technique: single isolated Cursor generation retelling the article in section order (~400 characters) with built-in voice constraints, lint-subset plus tweet-specific mechanical gates, and a fact-fidelity check against the article.
+3. **Twitter post writing** (`twitter_post_writing.md`) — channel sub-workflow of external writing: turn a finished article into a distribution tweet (Typefully long post) without inheriting the article's aphorism layer or collapsing into a template. Core technique: single isolated Antigravity generation retelling the article in section order (~400 characters) with built-in voice constraints, lint-subset plus tweet-specific mechanical gates, and a fact-fidelity check against the article.
 
 4. **News aggregation writing** (`workflow_news_aggregation.md`) — channel sub-workflow of external writing for recurring multi-item briefings. Three separable operations: pack one research item into a self-contained information packet inside the dated `tmp/news_aggregation_<YYYYMMDD>/` folder (folder located by date, never created; flat layout), discuss the outline with the user (stacked independent items by default; no forced unified theme), and run the external writing pipeline on the agreed outline with per-section fact discipline from each packet.
 
@@ -36,7 +36,7 @@ Before drafting, classify the audience:
 |---|---|---|
 | `workflow_internal_writing.md` | Drafting an internal memo, decision brief, work log | The agent doing the drafting |
 | `workflow_external_writing.md` | Drafting an external-facing article, survey report, course asset | The Main Agent (editorial + acceptance) and the writer conversation (drafting) |
-| `twitter_post_writing.md` | Turning a finished external article into a Twitter distribution post (Typefully long post) | The agent orchestrating publication; the single Cursor generation call |
+| `twitter_post_writing.md` | Turning a finished external article into a Twitter distribution post (Typefully long post) | The agent orchestrating publication; the single Antigravity generation call |
 | `workflow_news_aggregation.md` | Packing research into information packets, outlining or writing a multi-item news briefing | The agent running any of the three news-aggregation operations |
 | `bestpractice_external_prose.md` | Diagnosing why a candidate draft sounds like a textbook or is cognitively overloaded; writing the `voice_contract.md` | Main Agent only. Never paste into the writer context. Not a gate checklist. |
 | `reference_writing_thesis_catalog.md` | Brainstorming the thesis of an external article; finding the analytical angle | Main Agent during Round 1 (thesis / structure) |
@@ -44,9 +44,9 @@ Before drafting, classify the audience:
 
 ## The CLI
 
-Prose generation, rewrites, QA, and cold reads default to Cursor + Gemini 3.8 Flash High across all harnesses. Read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md) for the shared CLI contract; task-specific invocation, session isolation, and timeouts remain in the focused writing workflows.
+Prose generation, rewrites, QA, and cold reads default to Antigravity + Gemini 3.8 Flash High across all harnesses. Read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md) for the shared CLI contract; task-specific invocation, session isolation, and timeouts remain in the focused writing workflows.
 
-A deterministic scanner for external-facing Chinese Markdown. Counts em dashes, quotes, bracket glosses, polarity words, banned lexicon, single-sentence paragraphs, bare URLs, H2 count, title book marks, bei-passive candidates, and char count. Each finding attaches the matching skill rule as a review question. The CLI does not judge taste.
+A deterministic scanner for external-facing Chinese Markdown. Counts em dashes, quotes, bracket glosses, polarity words, banned lexicon, single-sentence paragraphs, bare URLs, English density, repeated URLs, domain-shaped anchors, H2 count, title book marks, bei-passive candidates, and char count. Each finding attaches the matching skill rule as a review question. The CLI does not judge taste.
 
 ```bash
 python -m writing_skill.external_prose_lint_cli path/to/article.md
@@ -62,7 +62,7 @@ The CLI is a hygiene floor, not a gate. A natural-language "scanned it, looks fi
 
 ## Honest limitations
 
-- The external writing workflow requires independent Cursor CLI sessions and access to `gemini-3.8-flash-high`. Cold reads cannot see contracts, briefs, or global writing rules; execution and input boundaries are specified in the focused workflow. This repo does not provision model access.
+- The external writing workflow requires independent Antigravity CLI sessions and access to `gemini-3.8-flash-high`. Cold reads cannot see contracts, briefs, or global writing rules; execution and input boundaries are specified in the focused workflow. This repo does not provision model access.
 - The lint CLI is Chinese-primary. It still reports shared mechanical signals (em dashes, bare URLs, link counts) on mixed-language drafts, but its banned lexicon and polarity patterns are Chinese.
 - The internal writing workflow assumes the reader knows the project but not the new concepts introduced this round. It does not assume the reader knows nothing — if the reader is fully external, use the external workflow instead.
 

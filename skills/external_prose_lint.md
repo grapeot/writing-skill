@@ -10,13 +10,13 @@
 
 ## 何时用
 
-- `workflow_external_writing.md` Round 4 自查、§9 确定性扫描
+- `workflow_external_writing.md` §5.1 Gate 1（机械代码校验器），以及 §5.3 作者文风改写之后的重跑
 - Writer / Main Agent 改完稿后的机械卫生检查
 - 用户说「对照 external facing writing 自查」且问题落在可程序化项上
 
 ## 何时不用
 
-- 教材声、起承转合、认识运动、认知负荷——仍走 blind read / cognitive walkthrough / 终端冷读
+- 教材声、起承转合、认识运动、认知负荷——仍然用 blind read / cognitive walkthrough / 终端冷读
 - 事实是否与 source_contract 一致——对照 contract，不靠本 CLI
 
 ## 命令
@@ -31,7 +31,7 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on any
 python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on never
 ```
 
-安装后即可运行（`uv pip install -e .`）。
+安装后就可以直接运行（`uv pip install -e .`）。
 
 退出码：`0` 无 hard finding（默认）；`1` 有 hard finding；`2` 文件错误。
 
@@ -49,6 +49,9 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `when_clause` | 当…时 / 在…的时候 翻译腔从句 | HARD |
 | `banned_word` | 稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线/奠定基础…） | HARD |
 | `single_sentence_paragraph` | 汉字≥20 的单句自然段 | REVIEW |
+| `english_density` | 单个 prose 段落英文词 >20（链接 URL 不计） | REVIEW |
+| `repeated_url` | 同一 URL 全文出现 >2 次（首现 1 次 + 文末来源清单 1 次为允许上限） | REVIEW |
+| `domain_anchor` | 锚文本是域名/URL 形态（如 `[cursor.com/...](url)`） | REVIEW |
 | `embedded_links` | `[text](url)` 计数 | INFO |
 | `bare_url` | 正文裸 `http(s)://` | HARD |
 | `h2_count` | `##` 数量（0 或 >8 待审） | REVIEW |
@@ -56,7 +59,7 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `bei_passive` | `被…` 候选 | REVIEW |
 | `char_count` | 汉字字数 | INFO |
 
-每条 finding 的 `Rule / Question` 来自 `COMMUNICATION.md`、`bestpractice_external_prose.md`、`workflow_external_writing.md` 与近两周 Antigravity/OpenCode 写作纠正的稳定 pattern。
+每条 finding 的 `Rule / Question` 来自 `COMMUNICATION.md`、`bestpractice_external_prose.md`、`workflow_external_writing.md` 和近两周 Antigravity/OpenCode 写作纠正的稳定 pattern。
 
 ## Agent 用法（强制）
 
@@ -75,7 +78,17 @@ python -m pytest tests/test_external_prose_lint_cli.py -q
 
 - CLI：`src/writing_skill/external_prose_lint_cli.py`
 - 测试：`tests/test_external_prose_lint_cli.py`
-- 工作流接入：`skills/workflow_external_writing.md` §7 / §9
+- 工作流接入：`skills/workflow_external_writing.md` §5.1 / §5.3
+
+## 英文占比与链接纪律（2026-09-24 新增）
+
+三条 REVIEW 规则对应用户明确 feedback，处理口径：
+
+- `english_density`：长英文引文压成中文转述 + 短引文（一句话以内、承重才留）；英文术语首次出现给中文称呼，后续统一中文。品牌名、通用借词（token、PR）、文件名（notes.md）可保留英文。
+- `repeated_url`：同一来源 URL 只在首次出现给嵌入链接，后续用文字指代来源（更新日志 / 论坛帖 / 官方文档），完整 URL 收进文末来源清单。
+- `domain_anchor`：所有链接用嵌入形式 `[中文标签](url)`，锚文本是中文标签或判断句；不贴裸 URL、不用域名当锚文本。
+
+stats 新增 `english_words`（正文英文词总数，链接不计），用于观察全文英文占比趋势。
 
 ## number_density（laundry list 检测）
 

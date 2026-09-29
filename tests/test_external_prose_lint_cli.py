@@ -204,4 +204,80 @@ def test_when_clause_translationese() -> None:
     assert by_id["when_clause"].has_finding
 
 
+def test_english_density_flags_long_quote_paragraph() -> None:
+    para = (
+        "官方写道：\"The coordinator agent in a project doesn't write code itself; "
+        "it plans the work, delegates it to agents that implement it, and brings "
+        "the finished work back to you to check. Coordinators create and manage "
+        "agents on your behalf, running as many in parallel as the work needs.\""
+    )
+    text = "# 标题\n\n" + para + "\n\n这是第二段，有两句话。第二句用来确保段落结构完整，避免误判。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["english_density"].count >= 1
+    assert by_id["english_density"].hard is False
 
+
+def test_english_density_ignores_link_urls_and_short_text() -> None:
+    text = (
+        "# 标题\n\n"
+        "正文句子一。这里有一个[嵌入链接](https://example.com/a-very-long-domain/path/with/many/segments)。第二句收束段落。\n\n"
+        "另一段。另一句补充说明，保证两句话。\n"
+    )
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["english_density"].count == 0
+    assert report.stats["english_words"] == 0
+
+
+def test_repeated_url_flags_extra_occurrences() -> None:
+    lines = [
+        "# 标题",
+        "",
+        "第一段。[来源](https://example.com/x)。另一句补齐段落长度，确保不是单句段。",
+        "",
+        "## 一",
+        "",
+        "第二段。[来源](https://example.com/x)。另一句补齐段落长度，确保不是单句段。",
+        "",
+        "## 二",
+        "",
+        "第三段。[来源](https://example.com/x)。另一句补齐段落长度，确保不是单句段。",
+    ]
+    report = cli.scan_text("\n".join(lines))
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["repeated_url"].count == 2
+    assert by_id["repeated_url"].hard is False
+    assert any("3 次" in h.text for h in by_id["repeated_url"].hits)
+
+
+def test_repeated_url_allows_source_list_plus_one_inline() -> None:
+    lines = [
+        "# 标题",
+        "",
+        "第一段。[来源](https://example.com/x)。另一句补齐段落长度，确保不是单句段。",
+        "",
+        "## 一",
+        "",
+        "第二段。来源见文末。另一句补齐段落长度，确保不是单句段。",
+        "",
+        "## 来源",
+        "",
+        "- [来源](https://example.com/x)",
+    ]
+    report = cli.scan_text("\n".join(lines))
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["repeated_url"].count == 0
+
+
+def test_domain_anchor_flags_url_like_anchors() -> None:
+    text = "# 标题\n\n正文一句。[cursor.com/blog/projects](https://cursor.com/blog/projects)。第二句收束，保证段落完整，不被单句段规则干扰。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["domain_anchor"].count >= 1
+    assert by_id["domain_anchor"].hard is False
+
+    text2 = "# 标题\n\n正文一句。[官方发布博客](https://cursor.com/blog/projects)。第二句收束，保证段落完整，不被单句段规则干扰。\n"
+    report2 = cli.scan_text(text2)
+    by_id2 = {c.id: c for c in report2.checks}
+    assert by_id2["domain_anchor"].count == 0

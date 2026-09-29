@@ -5,7 +5,7 @@
 - **Type**: Manager Reference (diagnostic vocabulary, not a gate checklist)
 - **Use when**: The Main Agent is writing `voice_contract.md` or diagnosing why a candidate sounds ceremonious or cognitively overloaded.
 - **Restriction**: Manager-only. **Never** paste this whole file into a prose writer's generation context, and it is **not** a checklist to tick off item by item during acceptance — acceptance happens in the workflow's three live gates; this file only supplies the names and the reasoning behind the judgments.
-- **Last updated**: 2026-07-23
+- **Last updated**: 2026-09-29
 
 ## 0. Why this file exists and how to use it
 
@@ -56,6 +56,8 @@ Voice failures often stem from organizing the article around **the writer's know
 - **Pattern phrases are diagnostic signals, not banned words**: "this is a...", "to understand X you must first understand Y", "this means far-reaching impact" are signals of definition-first entries / abstract subjects / summary tails. Once found, restructure the paragraph's movement rather than doing synonym replacement.
 - **Parenthetical translation is not terminology explanation**: doublings like "observability (可观测能力)" or "provenance（来源链）" usually only prove the writer knows the English word, without helping the reader understand its role in the current action. Except for formal full names, acronym expansions, original-language quotations, or a first-mention name with genuine retrieval value, do not use "Chinese (English)" or "English (Chinese gloss)." Pick one body term and let the following actions explain it. If meaning is unchanged after deleting the parenthetical, just delete it; if it becomes incomprehensible after deletion, that shows the syntax was not carrying the explanation — rewrite the relation rather than keep the entry.
 - **Analytical frameworks must melt down first**: a timeline, two axes, three layers, four questions, or a six-item checklist can help the Main Agent think, but they cannot automatically become H2s, images, lists, and the ending all at once. Run the **scaffold deletion test**: after deleting the "two axes / three layers / four questions" labels, can the concrete objects, actions, and consequences still drive the whole piece? If not, there is no narrative spine; if yes, keep only the one explicit framework that genuinely lowers burden.
+- **English share**: the body is a Chinese article. More than 20 English words in one paragraph (mechanical signal: `english_density`) means a wall of English quotation is drowning the Chinese judgment. Compress it into a Chinese paraphrase plus a short quote, keeping only the load-bearing sentence (one sentence at most). Give an English term a Chinese name on first use (coordinator → 协调员, subagent → 子代理) and use the Chinese name afterwards; brand names, common loanwords (token, PR) and file names stay in English.
+- **Link discipline**: link a source URL only at its first mention, refer to it in words afterwards ("the changelog", "the forum post", "the official docs"), and collect every URL in a source list at the end; quotations that re-link the same source read like a pile of footnotes. Every link is embedded as `[Chinese label](url)` with a Chinese label or a judgment sentence as the anchor, never a domain (`[cursor.com/blog/x](...)` reads as a pasted URL).
 
 ## 6. Two specialized diagnostics (new vocabulary, not gates)
 

@@ -7,15 +7,13 @@
 - **前置依赖**：`workflow_deep_research_survey.md` Phase 1-3 或等价事实底稿。
 - **诊断词汇**：`bestpractice_external_prose.md`（Manager 查阅，不是 gate 清单，不进 Writer 上下文）。
 - **机械自查 CLI**：`external_prose_lint.md`（`external_prose_lint_cli.py`）。
-- **最后更新**：2026-09-23
+- **最后更新**：2026-09-29
 
 ## 0. 这个文件的纪律
 
 这是操作主干。这里的每一条要么是**工件规格**，要么是**可执行、能阻断的 gate**——不放展开性的原则叙述（那些在 `bestpractice_external_prose.md`）。
 
-一条来自五个写作 session 的硬教训：把同一条 prose 规则写进九个地方、再让模型自述"我扫过了没问题"，规则不会 bind。模型看得见症状，但自述式 verdict 从不把症状转成阻断；scoped 的局部 PASS 被悄悄升级成全局 ACCEPT。**gate 只有在满足两个条件时才算数**：(a) 它的判定发生在一个看不到答案的上下文里；(b) 它的 verdict 由机器提取、由脚本阻断"完成"，不由 Main Agent 的语感覆盖。
-
-为解决“教材声”与“AI 腔”，本工作流借鉴 `ai_news_priority_research` 的经验，引入**多阶段强制全文重写管线**，并在终局实行**“机械代码校验器 + 终端冷读”的双重硬阻断**。
+一条来自五个写作 session 的硬教训：把同一条 prose 规则写进九个地方、再让模型自述"我扫过了没问题"，规则不会 bind。模型看得见症状，但自述式 verdict 从不把症状转成阻断；scoped 的局部 PASS 被悄悄升级成全局 ACCEPT。**gate 只有在满足两个条件时才算数**：(a) 它的判定发生在一个看不到答案的上下文里；(b) 它的 verdict 由机器提取、由脚本阻断"完成"，不由 Main Agent 的语感覆盖。因此本工作流用**多阶段强制全文重写管线**消除“教材声”与“AI 腔”，终局实行**“机械代码校验器 + 终端冷读”的双重硬阻断**。
 
 ## 1. 三种工作，不能同一个 context 做
 
@@ -43,8 +41,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
   --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- 调用方控制 10 分钟任务超时（外层 wrapper 须高于 AGY 的 `--print-timeout`）；quota 错误立即停止，不延长超时或循环重试。
-- 每次调用、每轮重跑均为全新会话：必须带 `--new-project`，不用 `--continue` / `--conversation`。
+- 调用方控制 10 分钟任务超时（外层 wrapper 须高于 AGY 的 `--print-timeout`）；quota 错误立即停止，不延长超时或循环重试。每次调用、每轮重跑均为全新会话：必须带 `--new-project`，不用 `--continue` / `--conversation`。
 - 启动时进程 cwd 必须指向该次调用的独立 minimal scratch（AGY 没有 `--workspace` flag，project scope 从 cwd 向上解析）。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
 - scratch 仅放该阶段授权输入，以绝对路径引用。
 - 冷读只见正文与极简评测 prompt，不见 brief、contracts、聊天历史、其他工件或全局写作规则。
@@ -54,8 +51,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 - 只说 external-facing：默认存 `contexts/survey_sessions/`。
 - 明确说博客：存 `contexts/blog/content/`。
-- 本地最终 Markdown 是写作终点。发布、排程、社交媒体、社区等外发动作必须等用户明确授权。
-- 配图是交付的一部分，见 §6。
+- 本地最终 Markdown 是写作终点，配图是交付的一部分（见 §6）。发布、排程、社交媒体、社区等外发动作必须等用户明确授权。
 
 ## 3. 写作前先选对文章
 
@@ -75,9 +71,9 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 标题和开头（H1 导语 + 第一个 H2）三条硬规则，违反任何一条即判开头不合格，回炉重跑：
 
-1. **标题自明**：第一次看到标题的读者必须能看懂这篇文章讲什么。主语必须显式（"被提及 139 次，选中 0 次"没有主语，失败；"Agent 提到 PayPal 139 次，选中 0 次"有主语有张力，成立）。标题里不出现测量对象缺失的数字、圈内暗号、只有作者懂的自造词；自造词可以放标题后半，但前半必须带主语与悬念。
-2. **earn-the-next 规则**：导语与第一个 H2 的**每一句话**都问一句：读者读完这句，获得了这篇文章内容的正确期待，还是读下去的理由？两者都没有的句子，删掉或重写。公司背景、融资批次、创始人来历、利益冲突披露都不是读下去的理由。利益冲突披露放到数据可信度讨论旁边（与"我们为什么复核这批数据"同段），让披露本身成为可信度论证的一部分，不放在文章最前面。
-3. **setup before numbers**：任何数字第一次出现之前，测量对象、测量者、测试 setting（谁测的、测的是什么、怎么测的）必须已经在正文里出现。读者读到"395 次支付测试中 PayPal 拿到 139 次提及"时，如果还不知道"支付测试"是什么，这一整段会被直接跳过——数字句不建立上下文就是认知负债。
+1. **标题自明**：第一次看见标题的读者就能明白这篇文章在说啥。要有显式主语（"被提及 139 次，选中 0 次"没主语，不合格；"Agent 提到 PayPal 139 次，选中 0 次"有主语、有张力，成立）。标题里不出现测量对象缺失的数字、行话、只有作者懂的造词；造词可以放在标题后半，前半必须有主语和钩子。
+2. **earn-the-next 规则**：导语和第一个 H2 的**每一句话**都要问一句：读者看完这句，是不是对这篇文章的内容有了正确预期，或者有了读下去的理由？都没有就删掉或重写。公司背景、融资轮次、创始人来历、利益冲突披露都不是读下去的理由。利益冲突披露放在数据可信度讨论旁边（和"我们为什么复核这批数据"放在同一段），让披露本身成为可信度论证的一部分，不放在文章最前面。
+3. **setup before numbers**：任何数字第一次出现前，测量对象、测量者、测试 setting（谁测的、测什么、怎么测的）要先在正文里出现。读者读到"395 次支付测试中 PayPal 拿到 139 次提及"时，如果不知道"支付测试"是个啥，会直接跳过这一整段——数字句不建立上下文就是认知负债。
 
 检查方法：把导语与第一个 H2 逐句读，每句后面写下读者拿到了什么（"知道买家在变" / "知道数据怎么来的" / "拿到最反直觉的事实" / "知道对自己有什么用"）。任何一句写不出来，那句不合格。
 
@@ -85,11 +81,11 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 ## 4. Round 2：多阶段成文管线
 
-成文不走“一步到位”或“盲目微调”，而是通过多阶段、独立上下文的传递来消除 AI 腔与教材声。分工原则：结构稿负责事实与结构；naturalize 重写负责 register，其 prompt 只装单一 voice 目标——两次写作 session 的实测：背着 10-11 项事实修正清单的多目标重写产物均落在报告腔、未过人工审阅，不带清单的单目标 naturalize 产物通过；事实修正在重写前后各有独立机械 pass；文风与陌生读者体感由 §5 双重 gate 判定。
+成文不走“一步到位”或“盲目微调”，而是用多阶段、独立上下文的传递来消除 AI 腔和教材声。分工上，结构稿负责事实与结构，naturalize 重写负责 register，它的 prompt 只含一个 voice 目标——两次写作 session 的实测：带着 10-11 项事实修正清单的多目标重写产物都落在报告腔、没过人工审阅，不带清单的单目标 naturalize 产物通过；事实修正在重写前后各有独立机械 pass；文风与陌生读者体感由 §5 的双重 gate 判定。
 
 1. **阶段一：结构稿（`draft.md`）**
-   - Main Agent 将 `writing_brief.md`、`content_map.md`、`source_contract.md` 放入阶段专属 minimal scratch，委托独立 Antigravity CLI 调用生成结构完整的初稿 `draft.md`，不直接手写正文 prose。
-   - 重点是事实保真、概念依赖图建立与 concrete carrier 铺设。
+   - Main Agent 把 `writing_brief.md`、`content_map.md`、`source_contract.md` 放进阶段专用的 minimal scratch，委托独立 Antigravity CLI 调用生成结构完整的初稿 `draft.md`，不直接手写正文 prose。
+   - 重点是事实保真、建立概念依赖图和铺设 concrete carrier。
 
 2. **阶段二：Manager draft 事实回查（Main Agent，机械）**
    - Main Agent 读回 `draft.md`，对照 `source_contract.md` 逐条回查事实、数字、日期、URL 与 claim 强度。能与 source contract 对照唯一确定的机械错误，直接在 `draft.md` 上就地修正（§1 权限边界允许这类机械修正）；需要 claim 强度或结构判断的问题回阶段一重跑或回 brief，不即兴点改。
@@ -126,7 +122,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 ```
 
 - **阻断标准**：必须贴出完整 stdout 捕获；回答所有 FINDINGS 问题并完成修改，直到 `hard_findings=0` 且 exit code 为 `0`。
-- **覆盖项**：破折号 `——`、普通概念词引号、中文（English）括号补译、评价标签（“很…：”）、极性词、元评论铺垫、不是 X 而是 Y、稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…）、单句段、被动“被”字句等。
+- **覆盖项**：破折号 `——`、普通概念词引号、中文（English）括号补译、评价标签（“很…：”）、极性词、元评论铺垫、不是 X 而是 Y、稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…）、单句段、被动“被”字句、英文密度（单段英文词 >20）、同一 URL 重复（>2 次）、域名形态锚文本等。
 - 自述“扫过了没问题”但未贴工具 stdout $\rightarrow$ **直接判 Gate 失败**。
 
 ### 5.2 Gate 2：不可 Overrule 的终端陌生读者冷读（Terminal Cold Read）
@@ -140,23 +136,25 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 - **机器硬阻断 Verdict**：必须以固定格式输出 `TERMINAL_VERDICT: SHIP` 或 `TERMINAL_VERDICT: BLOCK`（附失败原因）。
 - **阻断判定**：姿态判为讲师/顾问，或任一节复述失败，即输出 `BLOCK`；捕获到 `BLOCK` 则阻断完成，必须打回管线修正，无任何豁免理由。
 
+### 5.3 终局可选步骤：作者文风改写（voice rewrite）
+
+Gate 2 输出 `SHIP` 后，先检查本机能不能用作者文风改写：工作区 skill 索引里有 `voice-lora-rewrite`（公开版见 github.com/grapeot/voice-lora），且它的服务可以连通。两个条件缺一就跳过本步，并在交付说明里写明跳过。条件满足时，按该 skill 对 canonical Markdown 再做一遍逐段改写。本步不替代阶段三 naturalize。改写产物不能直接交付：Main Agent 必须逐段对照改写前后，核查事实漂移、格式破坏、前后一致性与起承转合；发现问题只把出问题的地方局部改回改写前（已过 Gate）的表述，这属于 §1 允许的机械修正。最后重跑 Gate 1，直到 exit code 为 `0`。
+
 ---
 
 ## 6. 配图
 
 短文（<2000 字）≥1 张，长文 ≥2-3 张。进最终 Markdown 的图必须来自 `gpt-image-2` 生成/重绘，压成 JPG/WebP，长边约 1024px、单图 <200KB，有相对路径与 alt（alt 写完整判断句）。
 
-视觉风格以发布渠道为准：若工作区的 publish skill 声明了站点视觉规范（site visual language），成图必须遵循该规范的构图、配色、渲染档位与文字纪律，并跟随其更新；两者冲突时以站点规范为准，不在本文件内复述细节。若工作区没有站点视觉规范，退回以下 pinned 摘要（pin 自 yage.ai/share 站点视觉规范 2026-08-20 版）：
+视觉风格：按工作区 publish skill 声明的站点视觉规范（site visual language）执行（构图、配色、渲染档位、文字纪律）并随站点更新；若二者冲突，以站点为准，此处不复述细节。若工作区无站点视觉规范，使用以下 pinned 摘要（pin 自 yage.ai/share 站点视觉规范 2026-08-20 版）：
 
-- 构图三选一：对比面板（A vs B）/ 传导链（因果流程，3-5 节点）/ 分层全景（层级系统）；一张图只讲一个判断。
-- 语义四色：奶油底 `#F6F2E7`；结构 `#6B7FE8`（线稿档 `#8298FF`）；钱/价值 `#E8A33D`（克制使用）；负信号 `#C6574A`（线稿档 `#C26B5A`，至多一处）；线字 `#2E3442`（线稿档 `#3A4150`）。
+- 构图只能选三种之一：对比面板（A vs B）/ 传导链（因果流程，3-5 节点）/ 分层全景（层级系统）；一图只表达一个判断。
+- 语义用四色：奶油底 `#F6F2E7`；结构 `#6B7FE8`（线稿档 `#8298FF`）；钱/价值 `#E8A33D`（克制使用）；负信号 `#C6574A`（线稿档 `#C26B5A`，至多一处）；线字 `#2E3442`（线稿档 `#3A4150`）。
 - 渲染二选一：像素档为默认（flat solid fills、chunky pixels、8-16 色、无渐变无抗锯齿），适合机制隐喻与概念对比；依赖精确标注（尺寸、条文、时间戳）的数据/协议/政策图用线稿档；同一篇内不混档。
 - 图内文字压到最少：2-6 字短标签或裸数字，句子一律不进图。
 
 ## 7. 交付
 
-双重 Gate（机械校验器退出码 0 + 终端冷读 `SHIP`）通过后：
-1. 确认归档文件路径清晰。
-2. 用 `view_file` 或 `read` 从开头读取最终 Markdown 进行肉眼检查。
-3. 向用户提供最终文件路径与残余风险说明。
-4. **交付即触发读取**：每次成稿或修改落盘后，Main Agent 必须立即 `read` 一次全文，让用户端能直接预览最终版本，并在回复中给出路径；只在文件系统写完、不触发读取，不算交付。
+在双重 Gate（机械校验器退出码 0 + 终端冷读 `SHIP`）和 §5.3（执行时）通过后：
+1. 给用户清晰的最终文件路径和残余风险说明（含 §5.3 是否执行）。
+2. **交付即触发读取**：每次成稿或修改落盘后，Main Agent 必须立刻用 `view_file` 或 `read` 从开头读一次全文并肉眼检查，让用户端能直接预览最终版本，并在回复中给出路径；只在文件系统写入、不触发读取，不算交付。
