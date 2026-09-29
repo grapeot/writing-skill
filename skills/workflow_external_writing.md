@@ -7,15 +7,13 @@
 - **前置依赖**：`workflow_deep_research_survey.md` Phase 1-3 或等价事实底稿。
 - **诊断词汇**：`bestpractice_external_prose.md`（Manager 查阅，不是 gate 清单，不进 Writer 上下文）。
 - **机械自查 CLI**：`external_prose_lint.md`（`external_prose_lint_cli.py`）。
-- **最后更新**：2026-09-23
+- **最后更新**：2026-09-29
 
 ## 0. 这个文件的纪律
 
 这是操作主干。这里的每一条要么是**工件规格**，要么是**可执行、能阻断的 gate**——不放展开性的原则叙述（那些在 `bestpractice_external_prose.md`）。
 
-一条来自五个写作 session 的硬教训：把同一条 prose 规则写进九个地方、再让模型自述"我扫过了没问题"，规则不会 bind。模型看得见症状，但自述式 verdict 从不把症状转成阻断；scoped 的局部 PASS 被悄悄升级成全局 ACCEPT。**gate 只有在满足两个条件时才算数**：(a) 它的判定发生在一个看不到答案的上下文里；(b) 它的 verdict 由机器提取、由脚本阻断"完成"，不由 Main Agent 的语感覆盖。
-
-为解决“教材声”与“AI 腔”，本工作流借鉴 `ai_news_priority_research` 的经验，引入**多阶段强制全文重写管线**，并在终局实行**“机械代码校验器 + 终端冷读”的双重硬阻断**。
+一条来自五个写作 session 的硬教训：把同一条 prose 规则写进九个地方、再让模型自述"我扫过了没问题"，规则不会 bind。模型看得见症状，但自述式 verdict 从不把症状转成阻断；scoped 的局部 PASS 被悄悄升级成全局 ACCEPT。**gate 只有在满足两个条件时才算数**：(a) 它的判定发生在一个看不到答案的上下文里；(b) 它的 verdict 由机器提取、由脚本阻断"完成"，不由 Main Agent 的语感覆盖。因此本工作流用**多阶段强制全文重写管线**消除“教材声”与“AI 腔”，终局实行**“机械代码校验器 + 终端冷读”的双重硬阻断**。
 
 ## 1. 三种工作，不能同一个 context 做
 
@@ -43,8 +41,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
   --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- 调用方控制 10 分钟任务超时（外层 wrapper 须高于 AGY 的 `--print-timeout`）；quota 错误立即停止，不延长超时或循环重试。
-- 每次调用、每轮重跑均为全新会话：必须带 `--new-project`，不用 `--continue` / `--conversation`。
+- 调用方控制 10 分钟任务超时（外层 wrapper 须高于 AGY 的 `--print-timeout`）；quota 错误立即停止，不延长超时或循环重试。每次调用、每轮重跑均为全新会话：必须带 `--new-project`，不用 `--continue` / `--conversation`。
 - 启动时进程 cwd 必须指向该次调用的独立 minimal scratch（AGY 没有 `--workspace` flag，project scope 从 cwd 向上解析）。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
 - scratch 仅放该阶段授权输入，以绝对路径引用。
 - 冷读只见正文与极简评测 prompt，不见 brief、contracts、聊天历史、其他工件或全局写作规则。
@@ -54,8 +51,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 - 只说 external-facing：默认存 `contexts/survey_sessions/`。
 - 明确说博客：存 `contexts/blog/content/`。
-- 本地最终 Markdown 是写作终点。发布、排程、社交媒体、社区等外发动作必须等用户明确授权。
-- 配图是交付的一部分，见 §6。
+- 本地最终 Markdown 是写作终点，配图是交付的一部分（见 §6）。发布、排程、社交媒体、社区等外发动作必须等用户明确授权。
 
 ## 3. 写作前先选对文章
 
@@ -140,6 +136,10 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 - **机器硬阻断 Verdict**：必须以固定格式输出 `TERMINAL_VERDICT: SHIP` 或 `TERMINAL_VERDICT: BLOCK`（附失败原因）。
 - **阻断判定**：姿态判为讲师/顾问，或任一节复述失败，即输出 `BLOCK`；捕获到 `BLOCK` 则阻断完成，必须打回管线修正，无任何豁免理由。
 
+### 5.3 终局可选步骤：作者文风改写（voice rewrite）
+
+Gate 2 输出 `SHIP` 后，先检查本机能不能用作者文风改写：工作区 skill 索引里有 `voice-lora-rewrite`（公开版见 github.com/grapeot/voice-lora），且它的服务可以连通。两个条件缺一就跳过本步，并在交付说明里写明跳过。条件满足时，按该 skill 对 canonical Markdown 再做一遍逐段改写。本步不替代阶段三 naturalize。改写产物不能直接交付：Main Agent 必须逐段对照改写前后，核查事实漂移、格式破坏、前后一致性与起承转合；发现问题只把出问题的地方局部改回改写前（已过 Gate）的表述，这属于 §1 允许的机械修正。最后重跑 Gate 1，直到 exit code 为 `0`。
+
 ---
 
 ## 6. 配图
@@ -155,8 +155,6 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 ## 7. 交付
 
-双重 Gate（机械校验器退出码 0 + 终端冷读 `SHIP`）通过后：
-1. 确认归档文件路径清晰。
-2. 用 `view_file` 或 `read` 从开头读取最终 Markdown 进行肉眼检查。
-3. 向用户提供最终文件路径与残余风险说明。
-4. **交付即触发读取**：每次成稿或修改落盘后，Main Agent 必须立即 `read` 一次全文，让用户端能直接预览最终版本，并在回复中给出路径；只在文件系统写完、不触发读取，不算交付。
+双重 Gate（机械校验器退出码 0 + 终端冷读 `SHIP`）以及 §5.3（执行时）通过后：
+1. 向用户提供清晰的最终文件路径与残余风险说明（含 §5.3 是否执行）。
+2. **交付即触发读取**：每次成稿或修改落盘后，Main Agent 必须立即用 `view_file` 或 `read` 从开头读一次全文并肉眼检查，让用户端能直接预览最终版本，并在回复中给出路径；只在文件系统写完、不触发读取，不算交付。

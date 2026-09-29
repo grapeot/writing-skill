@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-09-29
+
+- Added an optional final step to `skills/workflow_external_writing.md` (§5.3, and English mirror): after Gate 2 `SHIP`, if the workspace has the `voice-lora-rewrite` skill (github.com/grapeot/voice-lora) and its service is reachable, rewrite the canonical Markdown paragraph by paragraph in the author's voice; otherwise skip and say so at delivery. It does not replace Stage 3 naturalize (a field test confirmed naturalize is still needed). The Main Agent then compares every paragraph for fact drift, broken formatting, cross-paragraph consistency and flow, reverts only the problem spots to the pre-rewrite wording, and reruns Gate 1. One-in-one-out: merged the §0 pipeline overview into the gate paragraph, two adjacent §1.1 bullets, the §2 illustration bullet, and the duplicate "read the final Markdown" items in §7; the spine is back to 160 lines.
+
 ### 2026-09-17 (3)
 
 - Removed evidence-strength narrative from the writing skills (internal + external + news aggregation, Chinese canonical and English mirrors): dropped the "evidence strength / transferability" examples in section 4.2 and the object-layer rationale of `workflow_internal_writing.md`, the verdict-conclusion example phrase in the restatement check, the evidence-grade field in the news-aggregation source contract, the per-section "evidence boundary" endings in its voice contract, and the optional evidence-gap list. Rationale (user decision): evidence grading is already embedded in modern LLM training; restating it in writing rules overemphasizes it. Verifiability itself (in-situ evidence links) is unchanged.

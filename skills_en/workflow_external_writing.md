@@ -7,15 +7,13 @@
 - **Prerequisites**: `workflow_deep_research_survey.md` Phase 1-3 or equivalent verified factual record.
 - **Diagnostic vocabulary**: `bestpractice_external_prose.md` (for Manager review; not a gate checklist; never in Writer context).
 - **Mechanical self-check CLI**: `external_prose_lint.md` (`external_prose_lint_cli.py`).
-- **Last updated**: 2026-09-23
+- **Last updated**: 2026-09-29
 
 ## 0. Discipline of This Document
 
 This is the operational spine. Every item here is either an **artifact specification** or an **executable, blocking gate**, not an expanded discussion of principles (those belong in `bestpractice_external_prose.md`).
 
-A hard lesson from five writing sessions: repeating prose rules in nine places and asking a model to report that it checked them does not make them bind. Models see symptoms, but self-reported verdicts never turn them into blocks; a scoped local PASS silently becomes global ACCEPT. **A gate counts only when** (a) evaluated in a context blind to the answers, and (b) its verdict is machine-extracted and script-blocks completion, not overridden by the Main Agent's sense of language.
-
-To address textbook voice and AI tone, this workflow adopts a **multi-stage mandatory full-text rewrite pipeline** (adapted from `ai_news_priority_research`), culminating in **two hard blocks: a mechanical code linter and a terminal cold read**.
+A hard lesson from five writing sessions: repeating prose rules in nine places and asking a model to report that it checked them does not make them bind. Models see symptoms, but self-reported verdicts never turn them into blocks; a scoped local PASS silently becomes global ACCEPT. **A gate counts only when** (a) evaluated in a context blind to the answers, and (b) its verdict is machine-extracted and script-blocks completion, not overridden by the Main Agent's sense of language. This is why the workflow uses a **multi-stage mandatory full-text rewrite pipeline** against textbook voice and AI tone, and ends in **two hard blocks: a mechanical code linter and a terminal cold read**.
 
 ## 1. Three Kinds of Work That Cannot Share One Context
 
@@ -43,8 +41,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
   --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- The caller controls a 10-minute task timeout (outer wrapper higher than AGY's `--print-timeout`); quota errors stop immediately without extending timeout or retrying in loops.
-- Every call and rerun starts a fresh session: pass `--new-project`, never `--continue` / `--conversation`.
+- The caller controls a 10-minute task timeout (outer wrapper higher than AGY's `--print-timeout`); quota errors stop immediately without extending timeout or retrying in loops. Every call and rerun starts a fresh session: pass `--new-project`, never `--continue` / `--conversation`.
 - At launch, process cwd must point at that call's dedicated minimal scratch (AGY has no `--workspace` flag; project scope resolves by walking up from cwd). The caller must not load parent-workspace rules or global writing rules into the child; a separate directory is not an automatic rule shield.
 - Scratch contains only authorized inputs for that stage, referenced via absolute paths.
 - Cold reads receive only the body and a minimal evaluation prompt, never briefs, contracts, chat history, other artifacts, or global writing rules.
@@ -54,8 +51,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 - If the user only says external-facing: default to `contexts/survey_sessions/`.
 - If explicitly blog: `contexts/blog/content/`.
-- Local final Markdown is the endpoint. Publishing, scheduling, social media, community posting, and other outbound actions require explicit user authorization.
-- Illustrations are part of delivery (see Section 6).
+- Local final Markdown is the endpoint, and illustrations are part of delivery (see Section 6). Publishing, scheduling, social media, community posting, and other outbound actions require explicit user authorization.
 
 ## 3. Pick the Right Article Before Writing
 
@@ -130,6 +126,10 @@ After Gate 1, run a non-skippable, non-overridable terminal cold read:
 - **Machine-blocking verdict**: output the fixed format `TERMINAL_VERDICT: SHIP` or `TERMINAL_VERDICT: BLOCK` (with failure reasons).
 - **Blocking rule**: instructor/consultant posture or any section's retelling failure means `BLOCK`. Captured `BLOCK` prevents completion and returns the article to the pipeline for correction, with no exemptions.
 
+### 5.3 Optional Final Step: Author-Voice Rewrite (voice rewrite)
+
+After Gate 2 outputs `SHIP`, check whether an author-voice rewrite is available locally: the workspace skill index lists `voice-lora-rewrite` (public version at github.com/grapeot/voice-lora) and its service is reachable. If either is missing, skip this step and say so in the delivery notes. Otherwise, rewrite the canonical Markdown paragraph by paragraph with that skill. This step does not replace Stage 3 naturalize. The rewrite output is not deliverable as is: the Main Agent must compare every paragraph before and after, checking fact drift, broken formatting, consistency across paragraphs, and flow between them. Revert only the problem spots to the pre-rewrite (gate-passed) wording, which counts as a mechanical fix permitted by Section 1. Finally, rerun Gate 1 until exit code `0`.
+
 ---
 
 ## 6. Illustrations
@@ -145,8 +145,6 @@ Visual style follows the publishing channel: if the workspace publish skill decl
 
 ## 7. Delivery
 
-After both gates pass (linter exit 0 + terminal cold read `SHIP`):
-1. Confirm the archive path is clear.
-2. Read final Markdown from the beginning with `view_file` or `read` for a visual check.
-3. Give the user the final file path and residual risk notes.
-4. **Trigger a read on delivery**: every time the article or an edit lands on disk, the Main Agent must immediately `read` the full text so the user's client can preview the final version, and state the file path in the reply. Writing the file to disk without triggering a read does not count as delivery.
+After both gates pass (linter exit 0 + terminal cold read `SHIP`), plus Section 5.3 when it runs:
+1. Give the user a clear final file path and residual risk notes (including whether Section 5.3 ran).
+2. **Trigger a read on delivery**: every time the article or an edit lands on disk, the Main Agent must immediately `read` the full text from the beginning with `view_file` or `read` for a visual check so the user's client can preview the final version, and state the file path in the reply. Writing the file to disk without triggering a read does not count as delivery.
