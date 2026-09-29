@@ -14,7 +14,7 @@ The lexicon and several regexes are tuned for **Chinese external prose** (the pr
 
 ## When to use
 
-- `workflow_external_writing.md` Round 4 self-check and Section 9 deterministic scan
+- `workflow_external_writing.md` Section 5.1 Gate 1 (mechanical code linter), and the rerun after the Section 5.3 author-voice rewrite
 - After a writer/main-agent rewrite, before claiming mechanical hygiene is clean
 - When the user asks to self-check against external-facing style rules on programmable items
 
@@ -50,6 +50,9 @@ Exit codes: `0` no hard findings (default); `1` hard findings present; `2` file 
 | `not_x_but_y` | template "not X, but Y" | HARD |
 | `banned_word` | stable banned lexicon (growth/war metaphors, hollow evaluatives, etc.) | HARD |
 | `single_sentence_paragraph` | single-sentence prose paragraphs (CJK≥20) | REVIEW |
+| `english_density` | more than 20 English words in one prose paragraph (link URLs excluded) | REVIEW |
+| `repeated_url` | the same URL appears more than 2 times (first mention + one closing source-list entry is the allowed maximum) | REVIEW |
+| `domain_anchor` | the anchor text is a domain or URL (e.g. `[cursor.com/...](url)`) | REVIEW |
 | `embedded_links` | `[text](url)` count | INFO |
 | `bare_url` | bare `http(s)://` in body | HARD |
 | `h2_count` | `##` count (0 or >8 flagged) | REVIEW |
@@ -69,14 +72,24 @@ Each finding's `Rule / Question` comes from `COMMUNICATION.md`, `bestpractice_ex
 ## Tests
 
 ```bash
-python -m pytest rules/skills/tests/test_external_prose_lint_cli.py -q
+python -m pytest tests/test_external_prose_lint_cli.py -q
 ```
 
 ## Implementation
 
-- CLI: `rules/skills/external_prose_lint_cli.py`
-- Tests: `rules/skills/tests/test_external_prose_lint_cli.py`
-- Workflow hook: `rules/skills/workflow_external_writing.md` §7 / §9
+- CLI: `src/writing_skill/external_prose_lint_cli.py`
+- Tests: `tests/test_external_prose_lint_cli.py`
+- Workflow hook: `skills/workflow_external_writing.md` Section 5.1 / 5.3
+
+## English share and link discipline (added 2026-09-24)
+
+Three REVIEW rules from explicit user feedback, handled as follows:
+
+- `english_density`: compress long English quotes into a Chinese paraphrase plus a short quote (one sentence at most, only if load-bearing); give English terms a Chinese name on first use and use it afterwards. Brand names, common loanwords (token, PR) and file names (notes.md) may stay in English.
+- `repeated_url`: link a source URL only at its first mention, then refer to the source in words (changelog / forum post / official docs); the full URL goes in the closing source list.
+- `domain_anchor`: embed every link as `[Chinese label](url)` with a Chinese label or judgment sentence as the anchor; no bare URLs, no domains as anchors.
+
+Stats gain `english_words` (English words in prose paragraphs, links excluded) to track the article's English share.
 
 ## number_density (laundry-list detection)
 

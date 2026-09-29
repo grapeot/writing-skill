@@ -8,8 +8,8 @@
 - **Use when**: turning a finished, double-gated article into a Twitter distribution post (Typefully long post, Chinese). Publish actions (draft creation, scheduling) belong to the publishing-layer skill.
 - **Upstream**: `workflow_external_writing.md` (article-level workflow and gate philosophy).
 - **Created**: 2026-08-21; redesigned 2026-08-22 as the "structure reuse" route (v2) after two field failures with invented structures, then v3 added narration-rhythm requirements after user feedback.
-- **Executor**: the calling agent orchestrates; generation defaults to one isolated Cursor CLI call (`gemini-3.8-flash-high`); mechanical checks go through the lint CLI and deterministic commands.
-- **Last updated**: 2026-09-10
+- **Executor**: the calling agent orchestrates; generation defaults to one isolated Antigravity CLI call (`gemini-3.8-flash-high`); mechanical checks go through the lint CLI and deterministic commands.
+- **Last updated**: 2026-09-21
 
 ## 0. Core principle: reuse the article's structure, fix only the voice
 
@@ -20,7 +20,7 @@ Anti-template convergence is likewise inherited from the articles themselves. On
 ## 1. Workflow overview
 
 ```
-Article MD ──→ single Cursor generation (reads the full article, retells it in section order at ~400 chars, voice constraints built in)
+Article MD ──→ single Antigravity generation (reads the full article, retells it in section order at ~400 chars, voice constraints built in)
            └─→ Gate A (mechanical: lint subset + tweet-specific checks, must be zero)
            └─→ Gate B (fact fidelity + structure check against the article)
                 └─→ tweet_final.md (handed to the publishing flow)
@@ -30,17 +30,25 @@ The generation call never sees prior posts (prevents anchoring). The earlier two
 
 ## 2. Generation prompt core (single call, directly usable)
 
-First read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md). General CLI mechanics stay there; this task uses a dedicated minimal scratch directory and an absolute-path prompt:
+First read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md). General CLI mechanics stay there; this task uses a dedicated minimal scratch directory and an absolute-path prompt:
 
 ```bash
-cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path/to/minimal-scratch --output-format json "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md."
+agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md." \
+  --model gemini-3.8-flash-high \
+  --mode accept-edits \
+  --sandbox \
+  --dangerously-skip-permissions \
+  --new-project \
+  --print-timeout 10m \
+  --output-format json \
+  --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- The caller controls a 10-minute task timeout; stop on quota errors immediately without extending timeout or retrying in loops.
-- Each generation and failure rerun starts a fresh Cursor session, never `--resume` / `--continue`.
-- At launch, process cwd AND `--workspace` must both point to that call's dedicated minimal scratch. The caller must not load parent-workspace rules or global writing rules into the child; a separate directory is not an automatic rule shield.
+- The caller controls a 10-minute task timeout (outer wrapper higher than AGY's `--print-timeout`); stop on quota errors immediately without extending timeout or retrying in loops.
+- Each generation and failure rerun starts a fresh Antigravity session (with `--new-project`), never `--continue` / `--conversation`.
+- At launch, process cwd must point to that call's dedicated minimal scratch (AGY has no `--workspace` flag; project scope resolves by walking up from cwd). The caller must not load parent-workspace rules or global writing rules into the child; a separate directory is not an automatic rule shield.
 - Scratch contains only article text and this round's prompt (including the publishing-layer URL and specific correction requests), never prior posts.
-- Success requires exit 0 AND JSON `type: "result"` / `subtype: "success"` / `is_error: false` AND a non-empty `tweet_final.md` read back from disk before entering Gate A/B.
+- Success requires exit 0 AND stdout JSON `status: "SUCCESS"` AND a non-empty `tweet_final.md` actually landed in this scratch and read back from disk before entering Gate A/B.
 
 > Read the article below and write a Twitter distribution long post.
 > 1. **Mindset: retelling, not summarizing.** Imagine telling a colleague about an analysis you just read: pick what matters, slow down at key points, connect with your own spoken phrases ("looking at the data…", "in plain terms…", "which is why…"). A summary mindset makes every sentence push forward efficiently and reads rushed; a retelling has fast and slow parts.

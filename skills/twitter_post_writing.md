@@ -6,8 +6,8 @@
 - **适用场景**：从一篇已通过双重 gate 的文章生成 Twitter 导流文案（Typefully long post，中文）。发布动作本身（创建 draft、schedule）归发布层 skill，不在本文件内。
 - **上游**：`workflow_external_writing.md`（文章层工作流与 gate 哲学）。
 - **创建**：2026-08-21；2026-08-22 改版为"结构复用"路线（v2，见陷阱表最后两行：另起结构的两次实测失败）。
-- **执行者**：调用方 agent 编排；生成默认走 Cursor CLI（独立上下文，Gemini 3.8 Flash High），机械检查走 lint CLI 与确定性命令。
-- **最后更新**：2026-09-10
+- **执行者**：调用方 agent 编排；生成默认走 Antigravity CLI（独立上下文，Gemini 3.8 Flash High），机械检查走 lint CLI 与确定性命令。
+- **最后更新**：2026-09-21
 
 ## 0. 核心原则：复用文章结构，只治文风
 
@@ -18,7 +18,7 @@
 ## 1. 工作流总览
 
 ```
-文章 MD ──→ 单次 Cursor 生成（读文章全文，按章节顺序压缩成 ~400 字推文，文风约束内置）
+文章 MD ──→ 单次 Antigravity 生成（读文章全文，按章节顺序压缩成 ~400 字推文，文风约束内置）
         └─→ Gate A（机械：lint 适用子集 + tweet 特有检查，必须清零）
         └─→ Gate B（事实保真：数字/量词/限定词逐项对照文章）
              └─→ tweet_final.md（交付给发布流程）
@@ -28,17 +28,25 @@
 
 ## 2. 生成 prompt 核心（单次，可直接使用）
 
-先读 [ai-agent-cli 根 skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) 与 [Cursor focused skill](../../ai_agent_cli_skill/skills/cursor_cli.md)。通用技术说明留在那里；本任务使用独立 minimal scratch 与绝对路径 prompt：
+先读 [ai-agent-cli 根 skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) 与 [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md)。通用技术说明留在那里；本任务使用独立 minimal scratch 与绝对路径 prompt：
 
 ```bash
-cursor agent -p --model gemini-3.8-flash-high --trust --workspace /absolute/path/to/minimal-scratch --output-format json "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md."
+agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md." \
+  --model gemini-3.8-flash-high \
+  --mode accept-edits \
+  --sandbox \
+  --dangerously-skip-permissions \
+  --new-project \
+  --print-timeout 10m \
+  --output-format json \
+  --log-file /absolute/path/to/minimal-scratch/events.log
 ```
 
-- 调用方控制 10 分钟任务超时；quota 错误立即停止，不延长超时或循环重试。
-- 每次生成及失败重跑均为全新 Cursor 会话，不用 `--resume` / `--continue`。
-- 启动时进程 cwd 与 `--workspace` 必须同时指向该次调用的独立 minimal scratch。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
+- 调用方控制 10 分钟任务超时（外层 wrapper 须高于 AGY 的 `--print-timeout`）；quota 错误立即停止，不延长超时或循环重试。
+- 每次生成及失败重跑均为全新 Antigravity 会话（带 `--new-project`），不用 `--continue` / `--conversation`。
+- 启动时进程 cwd 必须指向该次调用的独立 minimal scratch（AGY 没有 `--workspace` flag，project scope 从 cwd 向上解析）。调用方不得向 child 加载父工作区规则或全局写作规则；独立目录本身不会自动屏蔽规则。
 - scratch 仅放文章正文与本轮生成 prompt（含发布层提供的 URL 和具体修正要求），不看旧文案。
-- 成功必须同时满足 exit 0、JSON `type: "result"` / `subtype: "success"` / `is_error: false`，以及 `tweet_final.md` 非空且读回核验，再进入 Gate A/B。
+- 成功必须同时满足 exit 0、stdout JSON `status: "SUCCESS"`，以及 `tweet_final.md` 非空、实际落在本次 scratch 且读回核验，再进入 Gate A/B。
 
 > 读下面这篇文章，写一条 Twitter 导流长推文。
 > 1. **心态：转述，不是摘要**。想象给同事转述一篇刚读完的分析：挑着讲、关键处放慢、用自己的口语连接（"从数据上看""说白了""这就导致"）。摘要心态会让每句话高效推进，读起来赶；转述心态有快有慢。

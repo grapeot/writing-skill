@@ -122,7 +122,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 ```
 
 - **阻断标准**：必须贴出完整 stdout 捕获；回答所有 FINDINGS 问题并完成修改，直到 `hard_findings=0` 且 exit code 为 `0`。
-- **覆盖项**：破折号 `——`、普通概念词引号、中文（English）括号补译、评价标签（“很…：”）、极性词、元评论铺垫、不是 X 而是 Y、稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…）、单句段、被动“被”字句等。
+- **覆盖项**：破折号 `——`、普通概念词引号、中文（English）括号补译、评价标签（“很…：”）、极性词、元评论铺垫、不是 X 而是 Y、稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…）、单句段、被动“被”字句、英文密度（单段英文词 >20）、同一 URL 重复（>2 次）、域名形态锚文本等。
 - 自述“扫过了没问题”但未贴工具 stdout $\rightarrow$ **直接判 Gate 失败**。
 
 ### 5.2 Gate 2：不可 Overrule 的终端陌生读者冷读（Terminal Cold Read）

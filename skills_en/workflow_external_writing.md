@@ -112,7 +112,7 @@ Actually run the deterministic scanner in the terminal:
 ```
 
 - **Blocking standard**: paste full captured stdout; answer every FINDINGS question and revise until `hard_findings=0` and exit code is `0`.
-- **Coverage**: em dashes `——`, ordinary concept quotes, Chinese (English) glosses, evaluative labels ("很…："), polarity, meta-preambles, not-X-but-Y, stable banned lexicon (长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…), single-sentence paragraphs, passive "被", etc.
+- **Coverage**: em dashes `——`, ordinary concept quotes, Chinese (English) glosses, evaluative labels ("很…："), polarity, meta-preambles, not-X-but-Y, stable banned lexicon (长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…), single-sentence paragraphs, passive "被", English density (>20 English words in a paragraph), repeated URLs (>2 occurrences), domain-shaped anchor text, etc.
 - Self-reported "scanned, looks fine" without tool stdout means **Gate failure**.
 
 ### 5.2 Gate 2: Non-Overridable Terminal Stranger-Reader Cold Read
