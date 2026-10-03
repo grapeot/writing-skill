@@ -138,7 +138,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 ### 5.3 终局可选步骤：作者文风改写（voice rewrite）
 
-Gate 2 输出 `SHIP` 后，先检查本机能不能用作者文风改写：工作区 skill 索引里有 `voice-lora-rewrite`（公开版见 github.com/grapeot/voice-lora），且它的服务可以连通。两个条件缺一就跳过本步，并在交付说明里写明跳过。条件满足时，按该 skill 对 canonical Markdown 再做一遍逐段改写。本步不替代阶段三 naturalize。改写产物不能直接交付：Main Agent 必须逐段对照改写前后，核查事实漂移、格式破坏、前后一致性与起承转合；发现问题只把出问题的地方局部改回改写前（已过 Gate）的表述，这属于 §1 允许的机械修正。最后重跑 Gate 1，直到 exit code 为 `0`。
+Gate 2 输出 `SHIP` 后，先检查本机能不能用作者文风改写：工作区 skill 索引里有 `voice-lora-rewrite`（公开版见 github.com/grapeot/voice-lora），且它的服务可以连通。两个条件缺一就跳过本步，并在交付说明里写明跳过。条件满足时，按该 skill 对 canonical Markdown 再做一遍逐段改写。本步不替代阶段三 naturalize。改写产物不能直接交付：Main Agent 必须逐段对照改写前后，核查事实漂移、信息遗漏、格式破坏、前后一致性与起承转合；发现问题时对改写稿本身做 surgical edit——错的信息改对、遗漏的信息补回、破坏的格式修好，其余保留改写后的措辞与节奏，不整段退回改写前（已过 Gate）的表述（退回等于把文风收益连同问题一起扔掉）。只有当某段被彻底破坏、无法在保留改写声音的前提下修复时，才恢复该段内容：内容以改写前文本为准，句子尽量保留改写后的声音。最后重跑 Gate 1，直到 exit code 为 `0`。
 
 ---
 
