@@ -17,7 +17,9 @@ def format_text(report: Report, *, max_hits: int = 15) -> str:
         f"h2={s['h2']} | md_links={s['md_links']} | images={s['images']} | "
         f"bare_urls={s['bare_urls']} | quotes={s['quotes']} | "
         f"single_sentence_paragraphs={s['single_sentence_paragraphs']} | "
-        f"number_density_paragraphs={s.get('number_density_paragraphs', 0)}"
+        f"number_density_paragraphs={s.get('number_density_paragraphs', 0)} | "
+        f"numbers_total={s.get('numbers_total', 0)} "
+        f"(≈{s.get('numbers_per_1000_cjk', 0)}/千汉字)"
     )
     lines.append(
         f"findings={s['findings']} (hard={s['hard_findings']}) — "
@@ -32,7 +34,12 @@ def format_text(report: Report, *, max_hits: int = 15) -> str:
         lines.append("## FINDINGS（需处理）")
         lines.append("")
         for c in findings:
-            hard = "HARD" if c.hard else "REVIEW"
+            if c.hard:
+                hard = "HARD"
+            elif c.id == "number_density":
+                hard = "WARNING"  # 认知负担预警：不阻断 exit code，但必须逐段回答或压数字
+            else:
+                hard = "REVIEW"
             extra = f" ({c.note})" if c.note else ""
             lines.append(f"### [{c.id}] count={c.count} [{hard}]{extra}")
             if c.hits:

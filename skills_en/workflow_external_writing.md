@@ -23,6 +23,10 @@ A hard lesson from five writing sessions: repeating prose rules in nine places a
 
 The Main Agent is editor, fact owner, and final acceptance authority, but **not the judge of prose**. That judgment belongs to independent cold reads that cannot see contracts and the deterministic CLI. The Main Agent may not touch up Writer prose by personal feel (except mechanical fixes uniquely determined against the source contract: typos, numbers, paths). Prose issues requiring taste judgment return to the pipeline.
 
+**Writer precedence rule (2026-10-03, ruled by the author)**: a paragraph of prose belongs to the last writer that touched it. Paragraphs rewritten by Antigravity (or any independent pipeline Writer) are governed by Antigravity; paragraphs run through voice rewrite are governed by the voice rewrite output. The Main Agent (unless it is itself the Writer machine, e.g. Gemini) **must not critique the style of Writer output and must not rewrite it to its own taste** — if it sees a problem, it sends the paragraph back to that Writer for a rerun, or surfaces the disagreement to the human. "This sentence feels AI-ish to me" is not grounds for a rewrite; it is grounds for a pipeline rerun or an escalation.
+
+**The sole exception is fact drift**: when Writer output drifts factually against `source_contract.md` / the draft baseline (numbers, dates, attribution, direction, claim strength, omitted or invented facts), the Main Agent applies surgical fixes directly to the rewritten text (per the voice-rewrite skill's fix rules: touch only the drifted points, keep the Writer's wording and voice, never revert whole paragraphs), and lists each fix as original → Writer output → corrected in the delivery notes. Any other wording difference is untouchable.
+
 ### 1.1 Execution and Context Isolation (Antigravity CLI)
 
 Draft generation, naturalize rewrite, fact drift check, and blind/terminal cold reads default to Antigravity + Gemini 3.8 Flash High across all harnesses. Do not edit a few lines in the Main Agent's context to simulate a rewrite or cold read.

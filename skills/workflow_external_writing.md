@@ -23,6 +23,9 @@
 
 Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 的判定者**——判定交给看不到 contract 的独立冷读与确定性 CLI。Main Agent 不得凭个人语感点修 Writer 的 prose（错字/数字/路径这类能与 source contract 对照唯一确定的机械修正除外）；需要品味判断的 prose 问题回给管线重跑。
 
+**Writer 层级的裁定规则（2026-10-03 鸭哥裁定）**：任何一段 prose 只属于最近一次触碰它的 writer。Antigravity（或任何管线内独立 Writer）改写过的段落以 Antigravity 为准；voice rewrite 跑过的段落以 voice rewrite 输出为准。Main Agent（除非它本身就是那台 Writer 机器，如 Gemini）**不得对 Writer 产出的文字风格说三道四，更不得照自己的观点回改**——觉得有问题就回管线让该 Writer 重跑，或者把分歧摆给人类裁定；「我感觉这句 AI 味重」不构成回改依据，只构成回管线或上报的理由。
+
+**唯一例外是 fact drift**：Writer 输出与 `source_contract.md` / draft 基准对照出现事实漂移（数字、日期、归属、方向、强度、遗漏或新增事实）时，Main Agent 直接对改写稿做 surgical fix（按 voice rewrite skill 的修复规则：只改漂移点、保留 Writer 的措辞与声线，不整段退回），改完在交付记录里逐条列出原文→Writer 输出→修正后。除此之外的任何措辞差异，一律不碰。
 ### 1.1 执行载体与上下文隔离约束（Antigravity CLI）
 
 初稿生成、naturalize 重写、事实漂移核查与盲读/终端冷读均默认通过 Antigravity + Gemini 3.8 Flash High 完成，所有 harness 一致。禁止在 Main Agent 的同一个 context 里局部修正几行冒充重写或冷读。
@@ -122,7 +125,7 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 ```
 
 - **阻断标准**：必须贴出完整 stdout 捕获；回答所有 FINDINGS 问题并完成修改，直到 `hard_findings=0` 且 exit code 为 `0`。
-- **覆盖项**：破折号 `——`、普通概念词引号、中文（English）括号补译、评价标签（“很…：”）、极性词、元评论铺垫、不是 X 而是 Y、稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…）、单句段、被动“被”字句、英文密度（单段英文词 >20）、同一 URL 重复（>2 次）、域名形态锚文本等。
+- **覆盖项**：破折号 `——`、普通概念词引号、中文（English）括号补译、评价标签（“很…：”）、极性词、元评论铺垫、不是 X 而是 Y、稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线…）、单句段、被动“被”字句、英文密度（单段英文词 >20）、同一 URL 重复（>2 次）、域名形态锚文本、数字认知负担（`number_density`，WARNING：单段 ≥5 个数字或连续 2 段各 ≥3 即触发，附全文数字总量与每千字密度；默认改法着眼 high-level intuition，压缩次要数字，详见 `external_prose_lint.md`）等。
 - 自述“扫过了没问题”但未贴工具 stdout $\rightarrow$ **直接判 Gate 失败**。
 
 ### 5.2 Gate 2：不可 Overrule 的终端陌生读者冷读（Terminal Cold Read）

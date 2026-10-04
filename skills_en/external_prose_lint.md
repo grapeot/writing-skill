@@ -55,9 +55,10 @@ Exit codes: `0` no hard findings (default); `1` hard findings present; `2` file 
 | `domain_anchor` | the anchor text is a domain or URL (e.g. `[cursor.com/...](url)`) | REVIEW |
 | `embedded_links` | `[text](url)` count | INFO |
 | `bare_url` | bare `http(s)://` in body | HARD |
-| `h2_count` | `##` count (0 or >8 flagged) | REVIEW |
+| `h2_count` | `##` count (0 or >4 flagged) | REVIEW |
 | `title_book_marks` | H1 with Chinese book-title marks | HARD |
 | `bei_passive` | Chinese passive `被…` candidates | REVIEW |
+| `number_density` | number cognitive load (single para >=5, or 2 consecutive paras >=3; totals + per-1000-chars density in stats) | WARNING |
 | `char_count` | CJK character count | INFO |
 
 Each finding's `Rule / Question` comes from `COMMUNICATION.md`, `bestpractice_external_prose.md`, `workflow_external_writing.md`, and stable multi-month correction patterns.
@@ -91,16 +92,18 @@ Three REVIEW rules from explicit user feedback, handled as follows:
 
 Stats gain `english_words` (English words in prose paragraphs, links excluded) to track the article's English share.
 
-## number_density (laundry-list detection)
+## number_density (number cognitive load, upgraded to WARNING 2026-10-03)
 
-High-density number listing is the mechanical signal of a laundry list: it looks substantive, but readers skip it. Detection rule (REVIEW level, not a final judgment):
+High-density number listing raises per-paragraph cognitive load: readers juggle a pile of numbers and the judgment gives way to counting numbers. It looks substantive, but readers skip it. Detection rule (WARNING level; does not block the exit code, but every hit must be resolved or justified):
 
-- a single prose paragraph containing >= 6 number tokens (Arabic numeral runs), or
+- a single prose paragraph containing >= 5 number tokens (Arabic numeral runs), or
 - >= 2 consecutive prose paragraphs each containing >= 3 number tokens.
 
-After it fires, the LLM judges:
-1. Is the paragraph a laundry list of facts (numbers without causality, imagery, or relations a reader can build)?
-2. If yes: pick 1-2 key intuitions from the number pile and expand only those; or group the numbers into 2-3 clusters each with one causal sentence; or move secondary numbers to a materials list/table.
+Output includes the article-wide totals `numbers_total` and per-1000-CJK-chars density `numbers_per_1000_cjk` (stats + header line) for CI and cross-article tracking.
+
+The default fix is to **aim for high-level intuition instead of technical detail**:
+1. Keep 1-2 numbers per paragraph — the ones that carry a causal or contrastive intuition. Test: does the paragraph's judgment still stand if you delete the number?
+2. Demote secondary numbers three ways: group them under one causal sentence ("the closed-source flagships cluster around 30: A 36.4, B 36.8"); downgrade to vague quantity ("8xH100 for 8 hours" → "a few cards for one evening"); or move them into a table/materials list.
 3. If the numbers are genuinely item-by-item checkable data (billing breakdown, benchmark table), keep them and state the reason in the self-check.
 
-Command unchanged: `python -m writing_skill.external_prose_lint_cli path/to/article.md`. Stats now include `number_density_paragraphs`.
+Command unchanged: `python -m writing_skill.external_prose_lint_cli path/to/article.md`. Stats now include `number_density_paragraphs`, `numbers_total`, and `numbers_per_1000_cjk`.

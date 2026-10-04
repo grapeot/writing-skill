@@ -54,9 +54,10 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `domain_anchor` | 锚文本是域名/URL 形态（如 `[cursor.com/...](url)`） | REVIEW |
 | `embedded_links` | `[text](url)` 计数 | INFO |
 | `bare_url` | 正文裸 `http(s)://` | HARD |
-| `h2_count` | `##` 数量（0 或 >8 待审） | REVIEW |
+| `h2_count` | `##` 数量（0 或 >4 待审） | REVIEW |
 | `title_book_marks` | H1 含《》 | HARD |
 | `bei_passive` | `被…` 候选 | REVIEW |
+| `number_density` | 数字认知负担（单段 ≥5 或连续 2 段各 ≥3；附全文总量与每千字密度） | WARNING |
 | `char_count` | 汉字字数 | INFO |
 
 每条 finding 的 `Rule / Question` 来自 `COMMUNICATION.md`、`bestpractice_external_prose.md`、`workflow_external_writing.md` 和近两周 Antigravity/OpenCode 写作纠正的稳定 pattern。
@@ -90,16 +91,16 @@ python -m pytest tests/test_external_prose_lint_cli.py -q
 
 stats 新增 `english_words`（正文英文词总数，链接不计），用于观察全文英文占比趋势。
 
-## number_density（laundry list 检测）
+## number_density（数字认知负担，2026-10-03 升级为 WARNING）
 
-数字高浓度罗列是 laundry list 的机械信号：看起来有内容，读者直接跳过。检测规则（REVIEW 级，不做最终判断）：
+数字高浓度罗列是认知负担的机械信号：读者要同时暂存一堆数字，判断让位给记数，看起来有内容，实际直接跳过。检测规则（WARNING 级，不阻断 exit code，但必须逐段处理或写明保留理由）：
 
-- 单个 prose 段落含 ≥6 个数字 token（阿拉伯数字串），或
+- 单个 prose 段落含 ≥5 个数字 token（阿拉伯数字串），或
 - 连续 ≥2 个 prose 段落各含 ≥3 个数字 token。
 
-触发后的处理（交给 LLM 判断）：
-1. 判断该段落是否 laundry list 式事实罗列（数字之间没有因果、没有画面、读者无法建立关系）。
-2. 若是：从数字堆里找出 1-2 个最关键的直觉只展开它们；或把数字归类成 2-3 组各配一句因果；或把次要数字移到材料清单/表格。
-3. 若数字确为逐项核对所需（账单明细、对照实验结果表），保留并在自查里写明理由。
+输出除命中段落外，还给出全文数字总量 `numbers_total` 与每千汉字数字密度 `numbers_per_1000_cjk`（stats + header 行），供 CI 与跨稿对比观察。
 
-命令不变：`python -m writing_skill.external_prose_lint_cli path/to/article.md`。输出 stats 新增 `number_density_paragraphs`。
+触发后的默认改法是**着眼 high-level intuition，不过分强调技术细节**：
+1. 一段只保留 1-2 个承担因果或对比直觉的数字；判断标准：删掉这个数字后，段落的判断是否依然成立。
+2. 次要数字三选一：归组配因果（「几家旗舰挤在 30 分上下：A 36.4、B 36.8」）；降级为约数（「8×H100 跑 8 小时」→「几块卡跑一晚」）；移入表格或材料清单。
+3. 确为逐项核对所需（账单明细、对照实验结果表）时保留，并在自查里写明理由。
