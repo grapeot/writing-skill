@@ -154,6 +154,8 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
 
     checks: list[CheckResult] = []
 
+    cjk_count = len(CJK_RE.findall(body))
+
     # em_dash
     hits = _collect_regex(scan, EM_DASH_RE)
     checks.append(
@@ -332,11 +334,14 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
 
     # number density (laundry list detector)
     prose_para_list: list[tuple[int, int, str]] = []
+    numbers_total = 0
     for start_line, block in all_prose_paras:
         # strip markdown link URLs and image URLs: version numbers inside URLs are
         # identifiers, not prose-number piles. Keep anchor text for counting.
         cleaned_block = MD_LINK_RE.sub(r"\1", block)
-        prose_para_list.append((start_line, len(NUMBER_TOKEN_RE.findall(cleaned_block)), block))
+        num_count = len(NUMBER_TOKEN_RE.findall(cleaned_block))
+        numbers_total += num_count
+        prose_para_list.append((start_line, num_count, block))
 
     density_hits: list[Hit] = []
     density_paras: list[tuple[int, int]] = []  # (line, number_count)
@@ -368,8 +373,11 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
             hard=False,
             rule=RULES["number_density"],
             note=(
-                f"单段≥{NUMBER_DENSITY_PARA_MIN_NUMBERS}个数字或连续{NUMBER_DENSITY_WINDOW_PARAS}段各≥"
-                f"{NUMBER_DENSITY_WINDOW_MIN_NUMBERS}个数字；疑似 laundry list，需人工判断"
+                f"WARNING: 认知负担信号——单段≥{NUMBER_DENSITY_PARA_MIN_NUMBERS}个数字或连续"
+                f"{NUMBER_DENSITY_WINDOW_PARAS}段各≥{NUMBER_DENSITY_WINDOW_MIN_NUMBERS}个数字；"
+                f"全文数字总量={numbers_total}，每千汉字≈"
+                f"{(numbers_total * 1000 // max(cjk_count, 1)) if cjk_count else 0}个；"
+                "默认着眼 high-level intuition，压缩次要数字"
             ),
         )
     )
@@ -518,7 +526,6 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
     )
 
     # char count
-    cjk_count = len(CJK_RE.findall(body))
     checks.append(
         CheckResult(
             id="char_count",
@@ -540,6 +547,8 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
         "quotes": len(q_all),
         "single_sentence_paragraphs": ssp_count,
         "number_density_paragraphs": len(density_paras),
+        "numbers_total": numbers_total,
+        "numbers_per_1000_cjk": (numbers_total * 1000 // cjk_count) if cjk_count else 0,
         "english_words": english_words,
         "findings": 0,
         "hard_findings": 0,

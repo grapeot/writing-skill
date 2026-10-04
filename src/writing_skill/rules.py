@@ -137,14 +137,14 @@ RULES: dict[str, str] = {
         "若是不可替代的技术本义（如生物学「生长」），保留并在自查里写明理由。"
     ),
     "number_density": (
-        "用户纠正：数字高浓度罗列是 laundry list 信号——看起来有内容，读者直接跳过。"
-        "若连续段落（≥2 段）各含 ≥3 个数字，或单段含 ≥6 个数字，触发本项。"
-        "诊断改法（bestpractice_external_prose.md 枚举税）："
-        "从数字堆里找出一到两个最关键的直觉只展开它们，"
-        "或把数字归类成 2-3 组各配一句因果，或把次要数字移入材料清单。\n"
-        "→ 下列段落是否 laundry list 式事实罗列？"
-        "是则按上述三种改法降低认知负担；若数字确为逐项核对所需（如账单明细），"
-        "保留并在自查里写明理由。"
+        "用户纠正（2026-10-03）：数字高浓度罗列推高每段认知负担，读者会直接跳过——"
+        "它看起来有内容，实际把判断让位给了记数。单段数字 token 触发线已收紧到 5，"
+        "连续 2 段各 ≥3 也触发；stats 另给出全文数字总量与每千字密度供 CI 观察。\n"
+        "默认改法是着眼 high-level intuition 而非技术细节：一段只保留 1-2 个承担因果"
+        "或对比直觉的数字，其余数字三选一处理——归组配因果、降级为约数（如「几块卡跑两天」）、"
+        "或移入表格/材料清单。判断数字去留的标准：删掉后段落判断是否依然成立。\n"
+        "→ 下列每段是否保留超过直觉承载所需的数字？按上述三法压缩；"
+        "确为逐项核对所需（账单明细、对照表）时保留并在自查里写明理由。"
     ),
     "single_sentence_paragraph": (
         "用户高频纠正（>50% 写作 session）：不要大量自然段只有一句话；"
@@ -236,8 +236,9 @@ NUMBER_TOKEN_RE = re.compile(
     r"\d+(?:[.,]\d+)?"
 )
 
-# Number-density thresholds per paragraph.
-NUMBER_DENSITY_PARA_MIN_NUMBERS = 6  # single paragraph with >= 6 numbers → candidate
+# Number-density thresholds per paragraph. 2026-10-03 用户纠偏：技术长文数字密集段
+# 是认知负担信号，阈值收紧，并新增全文总量观察（numbers_total / numbers_per_1000_cjk）。
+NUMBER_DENSITY_PARA_MIN_NUMBERS = 5  # single paragraph with >= 5 numbers → candidate
 NUMBER_DENSITY_WINDOW_PARAS = 2  # >= 2 consecutive prose paragraphs
 NUMBER_DENSITY_WINDOW_MIN_NUMBERS = 3  # each with >= 3 numbers
 

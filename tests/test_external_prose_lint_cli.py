@@ -281,3 +281,43 @@ def test_domain_anchor_flags_url_like_anchors() -> None:
     report2 = cli.scan_text(text2)
     by_id2 = {c.id: c for c in report2.checks}
     assert by_id2["domain_anchor"].count == 0
+
+
+def test_number_density_threshold_is_five_per_paragraph() -> None:
+    text = (
+        "# 标题\n\n"
+        "第一组成绩是 36.4 分、36.8 分、35.4 分，第二组是 16.4 分和 20.8 分，"
+        "最后一组为 62.17 分。随后一句收束判断，让数字落回因果。\n"
+    )
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["number_density"].count == 1
+    assert by_id["number_density"].has_finding
+    assert by_id["number_density"].hard is False
+    assert "WARNING" in by_id["number_density"].note
+
+
+def test_number_density_not_triggered_below_threshold() -> None:
+    text = "# 标题\n\n训练用了 8 块卡跑 8 小时，成本比原先省下一个量级。另一句收束判断。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["number_density"].count == 0
+
+
+def test_number_density_stats_include_totals() -> None:
+    text = "# 标题\n\n成绩是 36.4 分和 36.8 分，成本是 576 万次检索。另一句收束判断。\n"
+    report = cli.scan_text(text)
+    # 36.4, 36.8, 576 计 3 个 token（"万次"不是阿拉伯数字 token）
+    assert report.stats["numbers_total"] == 3
+    assert report.stats["numbers_per_1000_cjk"] >= 1
+
+
+def test_number_density_window_rule_two_consecutive_paragraphs() -> None:
+    text = (
+        "# 标题\n\n"
+        "第一段给出 36.4 分、36.8 分与 16.4 分的对比，随后一句把因果讲清楚。\n\n"
+        "第二段给出 29.5 分、35.4 分与 20.8 分的对照，随后一句把判断收住。\n"
+    )
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["number_density"].count == 2
