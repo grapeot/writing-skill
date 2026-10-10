@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### 2026-10-10
+
+- Rewrote the external-writing spine `skills/workflow_external_writing.md` (Chinese canonical + `skills_en` mirror) to fix consistency defects found in a pre-publication review and to bring it back inside its line budget, and rewrote the budget rule itself. Fixes folded into the rewrite: replaced the internal source label in the §3.4 / §3.5 headings with a neutral one (removed an ambiguous model-name-as-person label); aligned §1's "sole exception is fact drift" with §5.3 (structural/format restoration is also allowed); synced §7's delivery condition with §5.3's post-voice Gate 1 downgrade; removed the imprecise "Stage 5" time anchor in §5.3; added a §5.1 cross-reference to the post-voice downgrade; clarified that §3.5 sentence-level fixes are executed by the naturalize Writer, not the Main Agent; fixed the §3.5 table's one-to-one mapping; and merged §6.1's image-decision gate into §6's visual-rules section to drop duplication.
+- Changed AGENTS.md rule 2 from a flat `external ≤160 lines` cap to "aim ≤200 lines; one-in-one-out within the same edit; net growth beyond the budget needs a one-line rationale here." The flat cap no longer matched the spine's real scope (gates + post-voice handling + image decision). The spine is now 190 lines (was 215). English mirror re-synced; both `Last updated` bumped to 2026-10-10. (This commit also lands the earlier uncommitted edits to the same file dated 2026-10-03 / 10-04 / 10-07 / 10-08.)
+
 ### 2026-10-03
 
 - Writer precedence ruling from the OpenResearcher article session (user-directed): prose belongs to the last writer that touched it — Antigravity output wins for AGY-rewritten paragraphs, voice-rewrite output wins for voice-rewritten paragraphs; the Main Agent may not restyle or silently rewrite Writer output by personal feel, only rerun the pipeline or escalate. Sole exception: fact drift against source_contract/draft, fixed by surgical edits that keep Writer wording, then logged line by line. Written into workflow_external_writing.md (zh + workspace copy), skills_en mirror, and voice-lora-rewrite SKILL (public repo §3 + private overlay).

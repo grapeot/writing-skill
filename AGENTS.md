@@ -29,7 +29,7 @@ This is a **public repo**. No real emails, phone numbers, API keys, internal pat
 ## Rules for agents working on this repo
 
 1. Keep the root skill lean: router + routing rules + CLI pointer. Workflow detail belongs in the focused workflow files; diagnostic vocabulary belongs in the bestpractice file.
-2. The spine files (`workflow_external_writing.md`, `workflow_internal_writing.md`) carry a line budget (external ≤160 lines). Adding a new gate requires deleting an equivalent amount of old content (one-in-one-out).
+2. Keep the spine files (`workflow_external_writing.md`, `workflow_internal_writing.md`) lean: aim for ≤200 lines (external). Do not grow them by appending — when you add a gate or rule, tighten or merge existing content in the same edit (one-in-one-out). Net growth beyond the budget is allowed only with a one-line rationale recorded in `docs/working.md`. Prefer rewriting an existing section over adding a new one.
 3. Do not add "known pitfalls" entries speculatively. Only record failures that actually happened, with their fix.
 4. Update `docs/working.md` (Changelog + Lessons Learned) with every substantive change. Commit frequently, on `master`.
 5. Chinese is canonical for skill content; English mirrors must stay in sync. When the two disagree, Chinese wins and the English file gets updated.
