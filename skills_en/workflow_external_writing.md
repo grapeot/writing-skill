@@ -70,6 +70,8 @@ Before putting pen to paper or drafting a plan, first restate the existing eleme
 - **`voice_contract.md`**: Scenario-based description of target register ("sitting right beside you" level: unpretentious, concrete, devoid of posturing; short sentences deliver judgments, longer sentences connect cause and effect, paragraphs breathe); posture examples; banned polarizing words and cliché metaphors. Self-referential before→after examples do not enter the contract; they are selected by the Manager during the naturalize stage from the current draft (see §4 Stage 3).
 - **`content_map.md`**: Non-linear evidence card mapping (`body-essential` / `appendix-only` / `omit`).
 
+**Source-link discipline (hard requirement):** embed every research source inline in the body (`[label](url)`) so the reader can verify in place; never leave links only in a closing reference list or in a scratchpad / search manifest. **Do not create a separate references/sources section.** External articles carry at least 3 inline embedded links.
+
 ### 3.3 Opening Discipline: Headline and Lead Must Earn the Next
 
 A violation of any single rule in the headline and opening (H1 lead + first H2) constitutes an automatic failure, requiring a full rerun through the pipeline:

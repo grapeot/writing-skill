@@ -50,7 +50,7 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `banned_word` | 稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线/奠定基础…） | HARD |
 | `single_sentence_paragraph` | 汉字≥20 的单句自然段 | REVIEW |
 | `english_density` | 单个 prose 段落英文词 >20（链接 URL 不计） | REVIEW |
-| `repeated_url` | 同一 URL 全文出现 >2 次（首现 1 次 + 文末来源清单 1 次为允许上限） | REVIEW |
+| `repeated_url` | 同一 URL 全文出现 >2 次（同一来源只在首次出现给嵌入链接，文末不设来源清单） | REVIEW |
 | `domain_anchor` | 锚文本是域名/URL 形态（如 `[cursor.com/...](url)`） | REVIEW |
 | `embedded_links` | `[text](url)` 计数 | INFO |
 | `bare_url` | 正文裸 `http(s)://` | HARD |
@@ -86,7 +86,7 @@ python -m pytest tests/test_external_prose_lint_cli.py -q
 三条 REVIEW 规则对应用户明确 feedback，处理口径：
 
 - `english_density`：长英文引文压成中文转述 + 短引文（一句话以内、承重才留）；英文术语首次出现给中文称呼，后续统一中文。品牌名、通用借词（token、PR）、文件名（notes.md）可保留英文。
-- `repeated_url`：同一来源 URL 只在首次出现给嵌入链接，后续用文字指代来源（更新日志 / 论坛帖 / 官方文档），完整 URL 收进文末来源清单。
+- `repeated_url`：同一来源 URL 只在首次出现给嵌入链接，后续用文字指代来源（更新日志 / 论坛帖 / 官方文档）；不另设独立的参考资料来源章节，需要的来源一律行内嵌入。
 - `domain_anchor`：所有链接用嵌入形式 `[中文标签](url)`，锚文本是中文标签或判断句；不贴裸 URL、不用域名当锚文本。
 
 stats 新增 `english_words`（正文英文词总数，链接不计），用于观察全文英文占比趋势。
