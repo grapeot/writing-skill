@@ -70,6 +70,8 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 - **`voice_contract.md`**：目标 register 场景化描述（“坐在旁边”级别：平实具体不端着，短句落判断、长句连因果、段落有呼吸）；姿态范例；禁极性词与套路比喻。自指 before→after 样例不进 contract，由 Manager 在 naturalize 阶段从当次 draft 挑选（见 §4 阶段三）。
 - **`content_map.md`**：非线性证据卡片映射（`body-essential` / `appendix-only` / `omit`）。
 
+**来源链接纪律（硬要求）：** 调研得到的来源一律在正文就地嵌入（`[中文标签](url)`），供读者就地核查；不得只堆在文末参考资料、或只留在 scratchpad / search manifest。**不另设独立的参考资料来源章节。** 外部文章至少 3 个行内嵌入链接。
+
 ### 3.3 开头纪律：标题与导语必须 earn the next
 
 标题与开头（H1 导语 + 第一个 H2）违反任一条即判不合格，回炉重跑：

@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-10-12
+
+- Added a **source-link discipline** rule across the external-writing skill: research sources are embedded inline in the body (`[label](url)`) so the reader can verify in place; **no separate references/sources section**. Clarified that the old wording ("collect every URL in a closing source list") was superseded. Edited `skills/bestpractice_external_prose.md` §5 (link discipline), `skills/workflow_external_writing.md` §3.2 (new hard requirement), `skills/external_prose_lint.md` (`repeated_url` table row + the "English share / link discipline" note), and the `repeated_url` rule text in `src/writing_skill/rules.py`; English mirrors (`skills_en/…`) re-synced. Motivating session: a news-aggregation briefing where the author wanted the back-reference articles embedded inline rather than listed in a trailing references block.
+
 ### 2026-10-10
 
 - Rewrote the external-writing spine `skills/workflow_external_writing.md` (Chinese canonical + `skills_en` mirror) to fix consistency defects found in a pre-publication review and to bring it back inside its line budget, and rewrote the budget rule itself. Fixes folded into the rewrite: replaced the internal source label in the §3.4 / §3.5 headings with a neutral one (removed an ambiguous model-name-as-person label); aligned §1's "sole exception is fact drift" with §5.3 (structural/format restoration is also allowed); synced §7's delivery condition with §5.3's post-voice Gate 1 downgrade; removed the imprecise "Stage 5" time anchor in §5.3; added a §5.1 cross-reference to the post-voice downgrade; clarified that §3.5 sentence-level fixes are executed by the naturalize Writer, not the Main Agent; fixed the §3.5 table's one-to-one mapping; and merged §6.1's image-decision gate into §6's visual-rules section to drop duplication.
