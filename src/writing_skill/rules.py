@@ -74,6 +74,8 @@ BANNED_WORDS: tuple[str, ...] = (
     "结构性",
     "很稳",
     "更稳",
+    # worn shorthand metaphors readers shouldn't be shown
+    "尺子",
     # bare 值得 (after longer 值得* forms above)
     "值得",
     # scaffold phrases often left in body
@@ -132,6 +134,7 @@ RULES: dict[str, str] = {
         "external prose / COMMUNICATION / 晨报与 AGY writer 稳定禁词表："
         "空评价（值得*、意义重大）、战争/生长隐喻（击穿、打穿、拆解、长出来、生长、收口、闭眼编）、"
         "空架子名词（结构性、叙事弧线、奠定基础、赋能、范式转移、颠覆）、"
+        "套路比喻（尺子）、"
         "口语表演（疯狂发版、一地鸡毛、很稳）、脚手架（这意味着、从这个角度看）。\n"
         "→ 下列命中是否 AI 腔/空修辞？是则改成具体动作、事实或中性表述；"
         "若是不可替代的技术本义（如生物学「生长」），保留并在自查里写明理由。"

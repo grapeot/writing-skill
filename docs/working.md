@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-10-14
+
+- 禁词表新增「尺子」：作者反馈这是被用滥的套路比喻（正文里应换成「判断标准」「五个档次」这类平实说法），归入 `banned_word` 的 HARD 项。同步在 `banned_word` 规则说明里加「套路比喻（尺子）」一类。`tests/` 27 项通过。
+
 ### 2026-10-12
 
 - Added a **source-link discipline** rule across the external-writing skill: research sources are embedded inline in the body (`[label](url)`) so the reader can verify in place; **no separate references/sources section**. Clarified that the old wording ("collect every URL in a closing source list") was superseded. Edited `skills/bestpractice_external_prose.md` §5 (link discipline), `skills/workflow_external_writing.md` §3.2 (new hard requirement), `skills/external_prose_lint.md` (`repeated_url` table row + the "English share / link discipline" note), and the `repeated_url` rule text in `src/writing_skill/rules.py`; English mirrors (`skills_en/…`) re-synced. Motivating session: a news-aggregation briefing where the author wanted the back-reference articles embedded inline rather than listed in a trailing references block.
