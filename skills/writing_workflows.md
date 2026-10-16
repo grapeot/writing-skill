@@ -44,7 +44,7 @@ Before drafting, classify the audience:
 
 ## The CLI
 
-Prose generation, rewrites, QA, and cold reads default to Antigravity + Gemini 3.8 Flash High across all harnesses. Read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md) for the shared CLI contract; task-specific invocation, session isolation, and timeouts remain in the focused writing workflows.
+Prose generation, rewrites, QA, and cold reads default to Antigravity + Gemini 4 Argon High across all harnesses. Read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md) for the shared CLI contract; task-specific invocation, session isolation, and timeouts remain in the focused writing workflows.
 
 A deterministic scanner for external-facing Chinese Markdown. Counts em dashes, quotes, bracket glosses, polarity words, banned lexicon, single-sentence paragraphs, bare URLs, English density, repeated URLs, domain-shaped anchors, H2 count, title book marks, bei-passive candidates, and char count. Each finding attaches the matching skill rule as a review question. The CLI does not judge taste.
 
@@ -62,7 +62,7 @@ The CLI is a hygiene floor, not a gate. A natural-language "scanned it, looks fi
 
 ## Honest limitations
 
-- The external writing workflow requires independent Antigravity CLI sessions and access to `gemini-3.8-flash-high`. Cold reads cannot see contracts, briefs, or global writing rules; execution and input boundaries are specified in the focused workflow. This repo does not provision model access.
+- The external writing workflow requires independent Antigravity CLI sessions and access to `gemini-4-argon-high`. Cold reads cannot see contracts, briefs, or global writing rules; execution and input boundaries are specified in the focused workflow. This repo does not provision model access.
 - The lint CLI is Chinese-primary. It still reports shared mechanical signals (em dashes, bare URLs, link counts) on mixed-language drafts, but its banned lexicon and polarity patterns are Chinese.
 - The internal writing workflow assumes the reader knows the project but not the new concepts introduced this round. It does not assume the reader knows nothing — if the reader is fully external, use the external workflow instead.
 

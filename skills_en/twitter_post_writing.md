@@ -8,7 +8,7 @@
 - **Use when**: turning a finished, double-gated article into a Twitter distribution post (Typefully long post, Chinese). Publish actions (draft creation, scheduling) belong to the publishing-layer skill.
 - **Upstream**: `workflow_external_writing.md` (article-level workflow and gate philosophy).
 - **Created**: 2026-08-21; redesigned 2026-08-22 as the "structure reuse" route (v2) after two field failures with invented structures, then v3 added narration-rhythm requirements after user feedback.
-- **Executor**: the calling agent orchestrates; generation defaults to one isolated Antigravity CLI call (`gemini-3.8-flash-high`); mechanical checks go through the lint CLI and deterministic commands.
+- **Executor**: the calling agent orchestrates; generation defaults to one isolated Antigravity CLI call (`gemini-4-argon-high`); mechanical checks go through the lint CLI and deterministic commands.
 - **Last updated**: 2026-09-21
 
 ## 0. Core principle: reuse the article's structure, fix only the voice
@@ -34,7 +34,7 @@ First read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_a
 
 ```bash
 agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md." \
-  --model gemini-3.8-flash-high \
+  --model gemini-4-argon-high \
   --mode accept-edits \
   --sandbox \
   --dangerously-skip-permissions \

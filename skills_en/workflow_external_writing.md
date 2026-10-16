@@ -29,13 +29,13 @@ The Main Agent is the editor, factual owner, and final acceptor, but **not the p
 
 ### 1.1 Execution Vehicle and Context Isolation Constraints (Antigravity CLI)
 
-Initial drafting, naturalize rewriting, factual drift verification, and blind/terminal cold reading are executed by default via Antigravity + Gemini 3.8 Flash High, across a consistent harness. It is strictly prohibited to locally edit a few lines within the Main Agent's own context and pretend it was a rewrite or cold read.
+Initial drafting, naturalize rewriting, factual drift verification, and blind/terminal cold reading are executed by default via Antigravity + Gemini 4 Argon High, across a consistent harness. It is strictly prohibited to locally edit a few lines within the Main Agent's own context and pretend it was a rewrite or cold read.
 
 First read the ai-agent-cli root skill and the Antigravity focused skill; the general CLI technical specifications live there, and this workflow keeps only the task-specific invocation, isolation, and timeout requirements:
 
 ```bash
 agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact." \
-  --model gemini-3.8-flash-high \
+  --model gemini-4-argon-high \
   --mode accept-edits \
   --sandbox \
   --dangerously-skip-permissions \

@@ -29,13 +29,13 @@ Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 判
 
 ### 1.1 执行载体与上下文隔离约束（Antigravity CLI）
 
-初稿生成、naturalize 重写、事实漂移核查与盲读/终端冷读默认通过 Antigravity + Gemini 3.8 Flash High 完成，所有 harness 一致。严禁在 Main Agent 同一 context 里局部修正几行冒充重写或冷读。
+初稿生成、naturalize 重写、事实漂移核查与盲读/终端冷读默认通过 Antigravity + Gemini 4 Argon High 完成，所有 harness 一致。严禁在 Main Agent 同一 context 里局部修正几行冒充重写或冷读。
 
 先读 ai-agent-cli 根 skill 与 Antigravity focused skill；通用 CLI 技术说明留在那里，本工作流只保留任务特定的调用、隔离与超时要求：
 
 ```bash
 agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact." \
-  --model gemini-3.8-flash-high \
+  --model gemini-4-argon-high \
   --mode accept-edits \
   --sandbox \
   --dangerously-skip-permissions \
