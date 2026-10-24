@@ -180,10 +180,23 @@ Before generating each image, it must pass three questions; failure to answer me
 **Earn-its-place test**: If deleting the image does not impair comprehension, do not generate it; adjacent graphics and tables must not duplicate the same information.
 **Anti-patterns (rework immediately if present)**: Pure decoration without data or judgment, duplicating an immediately adjacent table, chapter-opening/article-closing illustrations, packing two judgments into one image, full sentences inside the image.
 
-Visual style: Follow site visual specifications (site takes precedence in case of conflict). If no site specification exists, adopt the default specification:
+Visual style is a hard gate, not a suggestion. Check for a site visual specification first; follow it only when the site explicitly defines one. When no site specification exists, the following default specification is mandatory and must not be replaced by reasons such as "it looks more professional" or "more like an editorial illustration". Image models drift toward smooth illustration by default; if the constraint is not written down, the output drifts.
+
 - Composition (choose one of three): Comparison panel (A vs B), transmission chain (3-5 node causality), tiered panorama (hierarchical system).
 - Semantic palette: Cream background `#F6F2E7`, structure `#6B7FE8` (line art `#8298FF`), value/money `#E8A33D`, negative signal `#C6574A` (line art `#C26B5A`, at most one occurrence), text/lines `#2E3442` (line art `#3A4150`).
-- Rendering tier (choose one of two): Pixel tier is default (8-16 flat colors without anti-aliasing, for mechanistic metaphors / conceptual comparisons); line art tier is for precise annotation of data / protocols / policies; never mix tiers within the same piece.
+- Rendering tier (choose one of two; never mix tiers within the same piece). **The pixel tier is the mandatory default**, for mechanistic metaphors and conceptual comparisons; the **line art tier** is used only for precise annotation of data, protocols, or policies. There is no third legal style.
+
+Hard definition of the pixel tier: the whole image uses only 8-16 solid colors, flat fills, hard edges, no anti-aliasing, no gradients, no soft shadows, no highlights, no glowing rounded corners, no 3D bevels. Any one of these appearing fails the gate. Hard definition of the line art tier: single- or two-color line drawing, uniform stroke width, precise text and annotations, no gradients or shadows.
+
+Before generation, write this section's constraints into the prompt; do not keep them only in your head. A pixel-tier prompt must explicitly include `pixel art, flat fills, 8-16 colors, hard edges, no anti-aliasing, no gradients, no soft shadows, no glossy highlights`. Do not use prompt words that pull the model toward smooth illustration: `editorial illustration`, `cinematic`, `modern vector`, `soft shadow`, `gradient`, `glossy`, `3D`, `isometric`. matplotlib or SVG may only be used for a flat layout skeleton (color blocks and text positions); they are not a final deliverable, and must not carry gradients, shadows, or anti-aliasing into the skeleton. The final file must be regenerated or repainted by GPT Image in the specified tier.
+
+Acceptance immediately after generation; if it fails, regenerate; never let a failing image into the Markdown:
+
+1. Count colors. For the pixel tier, use Pillow to count unique RGB values; after denoising, the main colors should fall in the 8-16 range; a clear excess fails.
+2. Inspect edges. Zoom to 200% and check whether color boundaries are hard; grayscale transitions or blurred edges fail.
+3. Inspect shadows and highlights. Soft drop shadows, glow, or gradients fail.
+4. Check the prompt. Confirm the prompt used at generation contained the pixel-tier keywords and none of the banned words.
+5. Do not generate until the tier, palette, and composition are settled. Settle the constraints first, then write the prompt, then generate; reversing the order means following the model's default aesthetic.
 
 ## 7. Delivery
 
