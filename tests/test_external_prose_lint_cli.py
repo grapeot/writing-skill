@@ -321,3 +321,31 @@ def test_number_density_window_rule_two_consecutive_paragraphs() -> None:
     report = cli.scan_text(text)
     by_id = {c.id: c for c in report.checks}
     assert by_id["number_density"].count == 2
+
+
+def test_passive_parallelism_flags_three_chained() -> None:
+    text = "能力被 agent 调用、被 agent 组装、被 agent 运营。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["passive_parallelism"].count >= 1
+    assert by_id["passive_parallelism"].hard is True
+    assert "被 agent" in by_id["passive_parallelism"].hits[0].text
+
+
+def test_passive_parallelism_flags_dunhao_pair() -> None:
+    text = "这些工具被团队使用、被客户验证。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["passive_parallelism"].count >= 1
+    assert "被团队使用" in by_id["passive_parallelism"].hits[0].text
+
+
+def test_passive_parallelism_allows_active_voice_and_single_passive() -> None:
+    text = (
+        "agent 可以调用公司的能力、组装公司的能力、运营公司。"
+        "任务被分配到队列。被动语态排比是英文直译。\n"
+    )
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["passive_parallelism"].count == 0
+    assert by_id["passive_parallelism"].has_finding is False

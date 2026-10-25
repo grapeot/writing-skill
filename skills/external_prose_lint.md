@@ -57,6 +57,7 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `h2_count` | `##` 数量（0 或 >4 待审） | REVIEW |
 | `title_book_marks` | H1 含《》 | HARD |
 | `bei_passive` | `被…` 候选 | REVIEW |
+| `passive_parallelism` | 连续 ≥3 个「被」或「被…、被…」排比（passive parallelism） | HARD |
 | `number_density` | 数字认知负担（单段 ≥5 或连续 2 段各 ≥3；附全文总量与每千字密度） | WARNING |
 | `char_count` | 汉字字数 | INFO |
 
@@ -90,6 +91,14 @@ python -m pytest tests/test_external_prose_lint_cli.py -q
 - `domain_anchor`：所有链接用嵌入形式 `[中文标签](url)`，锚文本是中文标签或判断句；不贴裸 URL、不用域名当锚文本。
 
 stats 新增 `english_words`（正文英文词总数，链接不计），用于观察全文英文占比趋势。
+
+## passive_parallelism（被动语态排比，2026-10-25 新增，HARD）
+
+这条检查只抓连续 ≥3 个「被」字排比，或用顿号串起的「被…、被…」；单个「被」字句不是绝对禁用，仍由 `bei_passive` 提示。两类检查分开，是因为一个被动句可能只是行文习惯，而连续被动排比会让读者一直猜动作的主语，属于必须拦截的翻译腔。
+
+命中后默认把动作发出者放回句首，改写成主动句：「能力被 agent 调用、被 agent 组装、被 agent 运营」改成「agent 可以调用公司的能力、组装公司的能力、运营公司」；主语不同时分别写出：「这些工具被团队使用、被客户验证、被平台分发」改成「团队使用这些工具，客户验证它们，平台负责分发」。
+
+检测会排除「被动语态」这类元讨论，避免把规则说明本身判成病句。
 
 ## number_density（数字认知负担，2026-10-03 升级为 WARNING）
 

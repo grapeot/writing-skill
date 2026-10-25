@@ -25,14 +25,14 @@ The lexicon and several regexes are tuned for **Chinese external prose** (the pr
 
 ## Commands
 
-From the workspace root (use `.venv/bin/python` if the workspace uses a venv):
+From the workspace root, after `uv pip install -e .` (use `.venv/bin/python` if the workspace uses a venv):
 
 ```bash
-python -m rules.skills.external_prose_lint_cli path/to/article.md
-python -m rules.skills.external_prose_lint_cli path/to/article.md --json
-python -m rules.skills.external_prose_lint_cli path/to/article.md --fail-on hard   # default
-python -m rules.skills.external_prose_lint_cli path/to/article.md --fail-on any
-python -m rules.skills.external_prose_lint_cli path/to/article.md --fail-on never
+python -m writing_skill.external_prose_lint_cli path/to/article.md
+python -m writing_skill.external_prose_lint_cli path/to/article.md --json
+python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on hard   # default
+python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on any
+python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on never
 ```
 
 Exit codes: `0` no hard findings (default); `1` hard findings present; `2` file error.
@@ -58,6 +58,7 @@ Exit codes: `0` no hard findings (default); `1` hard findings present; `2` file 
 | `h2_count` | `##` count (0 or >4 flagged) | REVIEW |
 | `title_book_marks` | H1 with Chinese book-title marks | HARD |
 | `bei_passive` | Chinese passive `被…` candidates | REVIEW |
+| `passive_parallelism` | ≥3 chained 被 passives, or a 被…、被… pair (passive parallelism) | HARD |
 | `number_density` | number cognitive load (single para >=5, or 2 consecutive paras >=3; totals + per-1000-chars density in stats) | WARNING |
 | `char_count` | CJK character count | INFO |
 
@@ -91,6 +92,14 @@ Three REVIEW rules from explicit user feedback, handled as follows:
 - `domain_anchor`: embed every link as `[Chinese label](url)` with a Chinese label or judgment sentence as the anchor; no bare URLs, no domains as anchors.
 
 Stats gain `english_words` (English words in prose paragraphs, links excluded) to track the article's English share.
+
+## passive_parallelism (passive parallelism, added 2026-10-25, HARD)
+
+This check flags only a run of ≥3 被 passives, or a 被…、被… pair joined by an enumeration comma. A single 被 sentence is not banned outright; `bei_passive` still reports it as REVIEW. The two checks are separate because one passive may be a local habit, while stacked passives make the reader keep guessing who performs each action and are a translationese pattern that must be blocked.
+
+The default fix is to put the actor back at the front and write active sentences: "能力被 agent 调用、被 agent 组装、被 agent 运营" becomes "agent 可以调用公司的能力、组装公司的能力、运营公司" (the agent can call, assemble, and operate the company's capabilities). When the actors differ, name each one: "这些工具被团队使用、被客户验证、被平台分发" becomes "团队使用这些工具，客户验证它们，平台负责分发" (the team uses these tools, customers validate them, the platform handles distribution).
+
+The detector skips meta-discussion such as "被动语态" so the rule text itself is not flagged.
 
 ## number_density (number cognitive load, upgraded to WARNING 2026-10-03)
 

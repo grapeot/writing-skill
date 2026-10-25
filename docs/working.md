@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-10-25
+
+- 新增「被动语态排比（passive parallelism）」规则，来自作者明确反馈：中文不写「被 agent 调用、被 agent 组装、被 agent 运营」这类英文被动排比，读者要一直猜动作的主语。落点：`skills/bestpractice_external_prose.md` 诊断词条、`skills/workflow_external_writing.md` §3.5 句子层问题表与 §5.1 覆盖项、`skills/external_prose_lint.md` 规则表与说明段、`src/writing_skill/rules.py` 规则文案、`src/writing_skill/scanner.py` 的 `passive_parallelism` HARD 检查，以及 `tests/test_external_prose_lint_cli.py` 的三条测试（三条连排、顿号两项、主动句与单个被动不误报，且排除「被动语态」元讨论）。英文镜像同步。口径：单个「被」仍由 `bei_passive` 提示；连续 ≥3 个「被」或「被…、被…」才由本规则拦截。Line-budget rationale: §3.5 只新增一行表格、§5.1 在原有覆盖项内补一个短语，spine 净增 1 行，其余未动。
+
 ### 2026-10-24
 
 - Made §6.1's visual style a hard gate after a session where two article illustrations shipped as smooth gradient/shadow vector illustrations instead of the required pixel tier. The pixel tier is now the mandatory default; added its hard definition (8-16 solid colors, flat fills, hard edges, no anti-aliasing/gradients/soft shadows/highlights/3D bevels), a required prompt keyword block plus banned prompt words, a rule that matplotlib/SVG are layout skeletons only and the final file must be GPT Image in the specified tier, and a five-step post-generation acceptance check. Chinese canonical + English mirror synced. Root cause: the old wording ("若无站点规范，采用默认规范") read as a fallback suggestion, and the style constraint was never written into the generation prompt. Line-budget rationale: §6.1 grew by ~20 lines to make the pixel default enforceable; the rest of §6 is unchanged.
@@ -99,6 +103,8 @@
 - Prepared for privacy review, GitHub repo creation, and migration of the two context-infrastructure repos.
 
 ## Lessons Learned
+
+- A passive-voice rule that only says "avoid 被" will either over-block normal Chinese or miss the real translationese pattern. Split the two: keep single passives as a REVIEW hint, and make the HARD rule count chains (≥3 被, or a 被…、被… pair). The detector must also exclude meta-discussion like 「被动语态」, or the rule text flags itself.
 
 - A visual style spec written as "default if no site spec" will be read as a suggestion. Make the default a hard gate, put the exact style keywords into the generation prompt, and verify the output mechanically (color count, edge hardness, shadows) before it enters the Markdown. If the constraint lives only in the workflow and not in the prompt, the image model's own aesthetic wins.
 
