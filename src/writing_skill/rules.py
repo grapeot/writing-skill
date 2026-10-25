@@ -24,6 +24,7 @@ CHECK_ORDER = [
     "h2_count",
     "title_book_marks",
     "bei_passive",
+    "passive_parallelism",
     "char_count",
 ]
 
@@ -38,6 +39,7 @@ HARD_ZERO_CHECKS = {
     "banned_word",
     "title_book_marks",
     "bare_url",
+    "passive_parallelism",
 }
 
 BANNED_WORDS: tuple[str, ...] = (
@@ -193,8 +195,18 @@ RULES: dict[str, str] = {
     ),
     "bei_passive": (
         "COMMUNICATION.md：主动语态，减少被动。避免英文直译「被…」。"
-        "只要去掉「被」仍然通顺，就去掉。\n"
+        "只要去掉「被」仍然通顺，就去掉。单个「被」字句不是绝对禁用。\n"
         "→ 下列含「被」的句子去掉「被」是否仍通顺？通顺则改主动。"
+    ),
+    "passive_parallelism": (
+        "COMMUNICATION.md / bestpractice_external_prose.md：中文不写英文式的被动排比"
+        "（passive parallelism）。「能力被 agent 调用、被 agent 组装、被 agent 运营」"
+        "「这些工具被团队使用、被客户验证」这类连续「被」字排比会让读者一直猜动作的主语。"
+        "单个「被」字句不是绝对禁用；连续 ≥3 个「被」或用顿号串起的「被…、被…」一律改。"
+        "诊断改法：让动作的主语回到句首，改成主动句："
+        "「agent 可以调用公司的能力、组装公司的能力、运营公司」；"
+        "「团队使用这些工具，客户验证它们，平台负责分发」。\n"
+        "→ 下列被动排比能否改成主语明确的主动句？"
     ),
     "char_count": (
         "用户纠正：外部分析长文 CJK 汉字字数要求在 2000 字以上（建议 2500 字以上）。"
@@ -229,6 +241,9 @@ NOT_X_BUT_Y_RE = re.compile(r"不是[^，。；\n]{0,20}，而是")
 WHEN_CLAUSE_RE = re.compile(r"当[^，。！？\n]{2,30}?[时候]|在[^，。！？\n]{2,30}?时候")
 BANNED_WORD_RE = re.compile("|".join(re.escape(w) for w in BANNED_WORDS))
 BEI_RE = re.compile(r"被[\u4e00-\u9fff]{1,12}")
+# 被动排比检测：排除「被动」这类元讨论，只看真正的「被」字标记。
+PASSIVE_TOKEN_RE = re.compile(r"被(?!动)")
+PASSIVE_CHAIN_MAX_GAP = 30  # 两个「被」之间超过这个长度就视为不同子句，不连成排比
 MD_LINK_RE = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)]+)\)")
 MD_IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 BARE_URL_RE = re.compile(r"(?<!\()(?<!\]\()https?://[^\s)\]>\"']+")

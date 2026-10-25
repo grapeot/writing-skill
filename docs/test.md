@@ -18,6 +18,9 @@ The only testable code is the lint CLI. The workflow Markdown files are not unit
 - `test_sentence_count_basic` — sentence terminator counting.
 - `test_h2_finding_when_zero` — zero H2s is a finding.
 - `test_banned_word_longest_match_and_list` — longest banned form preferred over bare `值得`.
+- `test_passive_parallelism_flags_three_chained` — three 被 passives in a row are flagged as HARD.
+- `test_passive_parallelism_flags_dunhao_pair` — a 被…、被… pair is flagged.
+- `test_passive_parallelism_allows_active_voice_and_single_passive` — active voice, a single 被 sentence, and the meta-term 「被动语态」 are not flagged.
 
 ## Integration tests
 

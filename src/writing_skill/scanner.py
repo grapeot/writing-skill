@@ -27,6 +27,8 @@ from writing_skill.rules import (
     NUMBER_DENSITY_WINDOW_MIN_NUMBERS,
     NUMBER_DENSITY_WINDOW_PARAS,
     NUMBER_TOKEN_RE,
+    PASSIVE_CHAIN_MAX_GAP,
+    PASSIVE_TOKEN_RE,
     WHEN_CLAUSE_RE,
     POLARITY_RE,
     QUOTE_RE,
@@ -141,6 +143,48 @@ def _paragraph_blocks(text: str) -> list[tuple[int, str]]:
         blocks.append((line, part))
         pos = idx + len(part)
     return blocks
+
+
+def _passive_parallelism_hits(text: str, limit: int = 40) -> list[Hit]:
+    """Flag chains of 被-passives: >=3 in one sentence, or a 被…、被… pair."""
+    hits: list[Hit] = []
+    for start_line, block in _paragraph_blocks(text):
+        offset = 0
+        for sentence in re.split(r"(?<=[。！？!?])", block):
+            tokens = list(PASSIVE_TOKEN_RE.finditer(sentence))
+
+            def flag(chain: list[re.Match[str]]) -> None:
+                if len(hits) >= limit or not chain:
+                    return
+                if len(chain) >= 3:
+                    is_parallel = True
+                elif len(chain) == 2:
+                    gap = sentence[chain[0].end() : chain[1].start()]
+                    is_parallel = "、" in gap
+                else:
+                    is_parallel = False
+                if not is_parallel:
+                    return
+                start = chain[0].start()
+                end = chain[-1].end()
+                snippet = sentence[start : min(len(sentence), end + 12)].replace("\n", " ")
+                line = start_line + block[: offset + start].count("\n")
+                hits.append(Hit(line, snippet[:72]))
+
+            chain: list[re.Match[str]] = []
+            for tok in tokens:
+                if not chain:
+                    chain = [tok]
+                    continue
+                gap = sentence[chain[-1].end() : tok.start()]
+                if len(gap.strip()) > PASSIVE_CHAIN_MAX_GAP:
+                    flag(chain)
+                    chain = [tok]
+                else:
+                    chain.append(tok)
+            flag(chain)
+            offset += len(sentence)
+    return hits
 
 
 def scan_text(text: str, path: str = "<stdin>") -> Report:
@@ -522,6 +566,19 @@ def scan_text(text: str, path: str = "<stdin>") -> Report:
             hits=[Hit(adj_line(h.line), h.text) for h in _collect_regex(scan, BEI_RE)],
             hard=False,
             rule=RULES["bei_passive"],
+        )
+    )
+
+    # passive parallelism: >=3 chained 被-passives, or a 被…、被… pair
+    pp_hits = _passive_parallelism_hits(scan)
+    checks.append(
+        CheckResult(
+            id="passive_parallelism",
+            count=len(pp_hits),
+            hits=[Hit(adj_line(h.line), h.text) for h in pp_hits],
+            hard=True,
+            rule=RULES["passive_parallelism"],
+            note="连续 ≥3 个「被」或「被…、被…」排比；单个「被」仍由 bei_passive 提示",
         )
     )
 
