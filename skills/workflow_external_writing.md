@@ -38,9 +38,9 @@
    - voice rewrite 后若仍有 hard findings，由主线程进行最小机械修正（改标点、禁词替换、拆 `当……时`），不改其余文字；无法机械修正的段落重新 run voice rewrite。
 4. **独立冷读通过**
    - 由调用方 harness 新开 fresh-context sub-agent 执行（Claude Code 用 Agent/Workflow，OpenCode 用其 subagent；模型就用调用方的主力模型，不必是 Claude），不用 Antigravity，也不能由编排流程的主线程或管线 agent 自己读。sub-agent 只拿到最终正文（内联或唯一的文件路径）和下面固定的评测 prompt，不给 `brief.md`、`source_contract.md` 或历史对话。Argon 负责写，评测换成逻辑更强、没见过任何上下文的读者。
-   - 冷读并行跑 3 次，`REREAD_COUNT` 取中位数，verdict 按多数。单次冷读波动很大，不能当阻断门槛。
+   - 冷读跑一次即可。早先观察到的大幅波动（同一稿 19 / 2 / 18）来自 Antigravity；换成 fresh-context sub-agent 后，同一稿三次判定一致（22 / 13 / 20 全 BLOCK，10 / 11 / 11 全 BLOCK），且点中的是同一批句子，不需要多跑取中位数。
    - 最后一行必须是 `TERMINAL_VERDICT: SHIP`。如果每千字回读点超过 1 处、口吻像汇报/研究报告/说教、复述不出 thesis、有逻辑断点、说不出进入理由或进入理由要叠加多个前提才成立，则判 `BLOCK`。
-   - 回读密度由主线程机械计算：`REREAD_COUNT`（三次的中位数）除以正文汉字数（千字）。评测模型给出 `SHIP` 但计算结果超过每千字 1 处时，按 `BLOCK` 处理，不采信 verdict 行。
+   - 回读密度由主线程机械计算：`REREAD_COUNT` 除以正文汉字数（千字）。评测模型给出 `SHIP` 但计算结果超过每千字 1 处时，按 `BLOCK` 处理，不采信 verdict 行。
    - 冷读 prompt 模板：
 ```
 只读给你的这一篇文章（内联在下方，或只读指定的这一个文件），不要读其他文件、不要搜索、不要写文件。只在回复中输出评测结果。

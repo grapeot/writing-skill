@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-10-26 (g)
+
+- Cold read back to a single run (zh + en). The three-run median added in (e) was a response to Antigravity's variance; fresh-context harness sub-agents proved consistent across three runs on two drafts (22 / 13 / 20 and 10 / 11 / 11, all BLOCK, same sentences flagged), so the extra runs only cost time. Author's call after seeing the data.
+
 ### 2026-10-26 (f)
 
 - Lint bans attribution hedges (按我们的理解、在我们的理解、我们的理解是、按我们的推断、在我们看来、我们认为、我们觉得) as HARD; new test. The research-memo pitfall entry (zh + en) now covers this form: the article is the author's view, judgments are stated directly, uncertainty is carried by content (what is unknown, how far evidence goes, conditionals), and checkers must not count removing these phrases as drift. Motivating feedback: the author asked why an article they wrote keeps saying "as we understand it", and whether it signals a lack of confidence.
