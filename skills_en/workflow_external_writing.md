@@ -22,11 +22,13 @@ All acceptance criteria are evaluated on the final `article.md` file. The main t
     - The opening must first answer why the reader wants to read: `brief.md` must state who the reader is, what they already care about right now (their own problem, not our topic), and where we connect to it, comparing at least two entry points before choosing. Threshold test: list the preconditions a reader must simultaneously meet to be hooked by the opening; if there are more than two, switch the entry point. The entry point must be something the body actually delivers on, with no bait-and-switch.
     - When site traffic history is available, check the traffic percentile of past articles on similar topics to validate that readers respond to the chosen entry type. In practice, "what does this mean for me / can I use it" entries consistently land in high percentiles, while mechanism deep dives mostly sit around or below the median; putting a hot company name in the title does not by itself bring traffic.
     - The title is self-explanatory so the reader immediately knows the subject and the question under discussion; every sentence in the lead gives the reader a reason to keep reading; before any number appears for the first time, state what is being measured.
+    - The skeleton is problem-driven, not a catalog: the H2 plan in `brief.md` is written as questions the reader would ask or challenges the designer must answer, not as object names. When analyzing a system, product, or technical decision, organize it as "what challenge → what goals → what decisions → what each decision buys and costs"; technical facts appear as consequences of decisions, rather than listing components first and then explaining where each is useful. The main thread checks the skeleton against this before handing the brief to Argon.
 2. **Zero Fact Drift**
     - Use an independent context to check the final draft (the text after voice rewrite) item by item against `source_contract.md`.
     - Drift count across numbers, dates, attributions, directions, claim strength, and added or omitted facts must be 0. Only the final text is evaluated.
     - The main thread adjudicates each checker finding. Independent checkers often report caveats that `brief.md` deliberately consolidated into one paragraph as "qualifier removed" and suggest re-attaching them to every sentence; per the brief's design these are not drift, otherwise the research-memo style creeps back into the body.
     - If a rewrite introduces explanatory common knowledge or new sourced facts, add them to `source_contract.md` before sending the text for checking; otherwise the checker will report them as added facts.
+    - Checkers are insensitive to deletion-type drift (a sentence still reads fine after voice drops an identity gloss or a qualifier). Give the checker the pre-voice version as well, and ask for a paragraph-by-paragraph comparison of lost facts or qualifiers.
 3. **Mechanical Lint Check Passes**
    - Run the lint command on the final draft:
 ```bash
@@ -35,12 +37,13 @@ All acceptance criteria are evaluated on the final `article.md` file. The main t
    - The final draft must satisfy `hard_findings=0` with exit code `0`, and the full stdout must be attached at submission.
    - If hard findings remain after voice rewrite, the main thread performs minimal mechanical fixes (fixing punctuation, replacing banned words, splitting `当……时` constructions) without changing other wording; paragraphs that cannot be fixed mechanically must be re-run through voice rewrite.
 4. **Independent Cold Read Passes**
-   - Start a new Antigravity session and paste only the final body text and the fixed evaluation prompt below, without `brief.md`, `source_contract.md`, or conversation history, to serve as the LLM-as-judge acceptance check.
+   - Run it as a fresh-context sub-agent of the calling harness (Agent/Workflow in Claude Code, a subagent in OpenCode; use the caller's main model, which need not be Claude). Do not use Antigravity, and do not let the main thread or the pipeline agent that orchestrates the article read it itself. The sub-agent receives only the final body text (inline, or a single file path) and the fixed evaluation prompt below, without `brief.md`, `source_contract.md`, or conversation history. Argon writes; the judge is a reader with stronger logic who has seen no context.
+   - Run the cold read 3 times in parallel; take the median `REREAD_COUNT` and the majority verdict. A single cold read varies too much to serve as a blocking gate.
    - The last line must be `TERMINAL_VERDICT: SHIP`. If reread points exceed 1 per 1,000 characters, the tone sounds like a status report, research report, or lecture, the judge cannot restate the thesis, there are logical gaps, or the judge cannot state a reason to keep reading (or the reason requires stacking multiple preconditions), the verdict is `BLOCK`.
-   - The main thread computes reread density mechanically: `REREAD_COUNT` divided by the body length in thousands of Chinese characters. If the judge says `SHIP` but the computed density exceeds 1 per 1,000 characters, treat it as `BLOCK` rather than trusting the verdict line.
+   - The main thread computes reread density mechanically: `REREAD_COUNT` (the median of the three runs) divided by the body length in thousands of Chinese characters. If the judge says `SHIP` but the computed density exceeds 1 per 1,000 characters, treat it as `BLOCK` rather than trusting the verdict line.
    - Cold-read prompt template:
 ```
-不要读写任何文件，不要调用任何工具。只在回复中输出评测结果。
+只读给你的这一篇文章（内联在下方，或只读指定的这一个文件），不要读其他文件、不要搜索、不要写文件。只在回复中输出评测结果。
 你是一个普通上班族，在地铁上用手机读这篇文章。你没读过任何相关报道，注意力有限，每句只读一遍，不回看。
 1. 逐段标出所有让你停下来、回读、或读完没抓住意思的句子，说明卡在哪（太长、定语太多、术语没解释、指代不清、和上文接不上、作者在讲自己的工作过程）。
 2. 口吻：读起来像朋友跟你讲一件事，还是像下属给老板汇报、像研究报告、像说教？举例。
@@ -80,7 +83,7 @@ When an acceptance check fails, fix it at the lowest possible layer:
   - When writing `brief.md` and again before delivery, the main thread answers three questions as the target reader: why would I click in, where would I stop reading, and what do I take away. If these cannot be answered, go back to topic and entry point instead of drafting or delivering. This step only catches topic and entry problems before the gates run; it does not replace the cold read and does not count as main-thread self-approval. Checking only that the process is complete, without reading the article as a reader, lets framing problems slip through to the end.
 - **Argon (`gemini-4-argon-high`)**: Responsible for drafting the body text and rewriting sections that fail the cold read based on cold-read feedback.
 - **voice rewrite**: Responsible for style rewriting to reduce AI phrasing.
-- **Lint and cold-read evaluators**: Responsible for evaluating the final draft.
+- **Lint and cold-read evaluators**: Responsible for evaluating the final draft. The cold reader is a fresh-context sub-agent of the calling harness, not Argon.
 
 ## Available Resources and Artifacts
 
@@ -120,6 +123,9 @@ The following recommendations are non-binding; the agent may adjust them to fit 
 The following are real failures that have occurred in practice:
 
 - **Cold read only asks for restatement and misses reading load (2026-10-26)**: Evaluation models have strong reading comprehension; if you only ask whether they can restate the thesis and whether the logic holds, the draft always passes and you fail to measure the reading load for an ordinary reader.
+- **Using Argon as the cold reader misses its own problems (2026-10-26)**: On the same draft (which contained a three-layer definition paragraph the author called unreadable), a Gemini cold read returned REREAD_COUNT 0 and SHIP; three fresh-context Claude sub-agents each read it once and returned 22 / 13 / 20, all BLOCK, all pointing at that definition paragraph, a rebuttal of a claim nobody had made, and a lead that required two stacked preconditions, matching the author's judgment. Gemini run three times on another candidate gave 19 / 2 / 18 with flipping verdicts. When the same model writes and judges, the judge is blind to its own habits, and logical judgment is not Argon's strength.
+- **Deletion-type fact drift slips past the fact check (2026-10-26)**: voice rewrite dropped "open-source inference engine" from the lead and turned "cannot be called inherently low-latency" into "this does not mean low latency"; two independent fact checks missed both, and only a cold reader saying "I don't know what SGLang is" exposed them.
+- **Cataloging the "what" turns the article into a manual (2026-10-26)**: Introducing a system's layers and components first ("the stage layer handles...; the session layer...; the graph describes...") and then explaining where each is useful forces the reader to memorize a list of names without knowing why; the author called it unreadable, with too high a cognitive burden. Rewrite from the designer's seat: challenges and goals first, then the decisions they lead to; drop component names wherever possible. A related failure: setting up a classification framework first and then filling it in; empty cells and naming collisions in the framework make the cold read oscillate.
 - **Research memo style bleeding into body prose (2026-10-26)**: Cramming fact/inference/unknown labels and every qualifier into a single sentence produces long modifiers and a status-report tone.
 - **Meta sentences about the author's workflow appearing in prose (2026-10-26)**: Examples like `本次讨论由 2026 年 10 月 16 日生效的新版隐私政策触发` or `在查看……后发现`; readers do not need to know the author's working process.
 - **Main thread rewriting body prose itself (2026-10-26)**: When the main thread rewrote the Chinese body text directly from author feedback, the author rated the quality poorly and the draft was abandoned. Body text must be drafted and rewritten by Argon.
