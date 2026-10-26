@@ -29,13 +29,13 @@ The Main Agent is the editor, factual owner, and final acceptor, but **not the p
 
 ### 1.1 Execution Vehicle and Context Isolation Constraints (Antigravity CLI)
 
-Initial drafting, naturalize rewriting, factual drift verification, and blind/terminal cold reading are executed by default via Antigravity + Gemini 3.8 Flash High, across a consistent harness. It is strictly prohibited to locally edit a few lines within the Main Agent's own context and pretend it was a rewrite or cold read.
+Initial drafting, naturalize rewriting, factual drift verification, and blind/terminal cold reading are executed by default via Antigravity + Gemini 4 Argon High, across a consistent harness. It is strictly prohibited to locally edit a few lines within the Main Agent's own context and pretend it was a rewrite or cold read.
 
 First read the ai-agent-cli root skill and the Antigravity focused skill; the general CLI technical specifications live there, and this workflow keeps only the task-specific invocation, isolation, and timeout requirements:
 
 ```bash
 agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact." \
-  --model gemini-3.8-flash-high \
+  --model gemini-4-argon-high \
   --mode accept-edits \
   --sandbox \
   --dangerously-skip-permissions \
@@ -65,22 +65,21 @@ Before putting pen to paper or drafting a plan, first restate the existing eleme
 ### 3.2 Prepare Contract Artifacts
 
 - **`source_contract.md`**: Factually complete, containing zero speculation.
-- **`writing_brief.md`**: Reader start state / takeaway / exact thesis / H2 structural outline (4-6 `## H2` headings) / candidate headlines.
+- **`writing_brief.md`**: Reader start state / the reader's existing concern and entry options (see §3.3) / takeaway / exact thesis / H2 structural outline (4-6 `## H2` headings) / candidate headlines.
 - **`audience_contract.md`**: Concepts known to the reader vs. unknown concepts that must not be assumed, plus the single takeaway.
 - **`voice_contract.md`**: Scenario-based description of target register ("sitting right beside you" level: unpretentious, concrete, devoid of posturing; short sentences deliver judgments, longer sentences connect cause and effect, paragraphs breathe); posture examples; banned polarizing words and cliché metaphors. Self-referential before→after examples do not enter the contract; they are selected by the Manager during the naturalize stage from the current draft (see §4 Stage 3).
 - **`content_map.md`**: Non-linear evidence card mapping (`body-essential` / `appendix-only` / `omit`).
 
 **Source-link discipline (hard requirement):** embed every research source inline in the body (`[label](url)`) so the reader can verify in place; never leave links only in a closing reference list or in a scratchpad / search manifest. **Do not create a separate references/sources section.** External articles carry at least 3 inline embedded links.
 
-### 3.3 Opening Discipline: Headline and Lead Must Earn the Next
+### 3.3 Opening Discipline: First Answer Why the Reader Would Read This
 
-A violation of any single rule in the headline and opening (H1 lead + first H2) constitutes an automatic failure, requiring a full rerun through the pipeline:
+The first job of the opening (headline, H1 lead, and first H2) is to answer why the reader would want to read it; a scene, an abstract question, or a field observation is only the way in. Give the opening as much thought as drafting the body. A violation of any single rule constitutes an automatic failure, requiring a full rerun through the pipeline:
 
-1. **Self-evident headline**: The reader understands what it is about at first glance. Must have an explicit subject and tension; must not contain unmoored numbers with no measurement target, jargon, or coined words (coined words may appear in the second half, but the first half must have a subject and hook).
-2. **Earn-the-next rule**: Every sentence in the lead and first H2 must establish correct expectations or give the reader a reason to keep reading; otherwise delete or revise it. Background, funding rounds, and founder biographies are not valid reasons. Conflict of interest disclosures must be presented in the same paragraph discussing data credibility, becoming part of the argument rather than placed at the very top of the text.
-3. **Setup before numbers**: Before a number appears for the first time, the measurement object, the entity measuring it, and the test setting must be introduced first. A raw number without established context is a cognitive debt.
-
-Verification method: Read through the lead and first H2 sentence by sentence, checking what the reader gains from each sentence (cognitive expectation / data source / counterintuitive fact / personal relevance); failure to articulate this marks it as non-compliant.
+1. **Enter through a concern the reader already has**: `writing_brief.md` states who the reader is, what they already care about right now (their own problem, not our topic), and where our content connects to it; compare at least two entry options before choosing. **Threshold test**: list the preconditions a reader must meet at the same time to be drawn in by the opening (e.g., "has used a voice assistant × knows its internals × is curious about them × cares about inference infrastructure"); more than two means pick another entry. The entry must be something the body delivers; no bait-and-switch.
+2. **Self-evident headline**: The reader understands what it is about at first glance. Must have an explicit subject and tension; must not contain unmoored numbers with no measurement target, jargon, or coined words (coined words may appear in the second half, but the first half must have a subject and hook).
+3. **Earn-the-next rule**: Every sentence in the lead and first H2 must establish correct expectations or give the reader a reason to keep reading; otherwise delete or revise it. Check sentence by sentence what the reader gains (cognitive expectation / data source / counterintuitive fact / personal relevance); failure to articulate this marks it as non-compliant. Background, funding rounds, and founder biographies are not valid reasons. Conflict of interest disclosures must be presented in the same paragraph discussing data credibility, becoming part of the argument rather than placed at the very top of the text.
+4. **Setup before numbers**: Before a number appears for the first time, the measurement object, the entity measuring it, and the test setting must be introduced first. A raw number without established context is a cognitive debt.
 
 ### 3.4 Body Logic Discipline: Explain Why First; Foreshadowing Must Pay Off (Course Review Feedback, 2026-10)
 
@@ -155,8 +154,8 @@ Run the deterministic scanning tool in the terminal:
 
 After passing Gate 1, launch a brand new independent Antigravity CLI session (minimal scratch containing only the final body text and a minimalist evaluation prompt, isolated from briefs, contracts, and history):
 
-- **Evaluation output**: (1) Reader posture perception (peer sharing vs. condescending/talking down); (2) Jargon-free restatement test (whether each section can be restated in plain vernacular); (3) Logical breakpoints (evaluation prior to introduction, unclosed foreshadowing, topic jumping, forward/backward disconnection).
-- **Hard-blocking Verdict**: Must output in fixed format `TERMINAL_VERDICT: SHIP` or `TERMINAL_VERDICT: BLOCK` (with reasons). An inappropriate posture, restatement failure, or presence of logical breakpoints must output `BLOCK`, which must be rejected back through the pipeline for revision, with zero exemptions.
+- **Evaluation output**: (1) Reader posture perception (peer sharing vs. condescending/talking down); (2) Jargon-free restatement test (whether each section can be restated in plain vernacular); (3) Logical breakpoints (evaluation prior to introduction, unclosed foreshadowing, topic jumping, forward/backward disconnection); (4) Reason to enter (the evaluation prompt carries only a one-line target-reader identity, no thesis; after reading only the headline and lead, the cold reader states, as that reader, why they would keep reading).
+- **Hard-blocking Verdict**: Must output in fixed format `TERMINAL_VERDICT: SHIP` or `TERMINAL_VERDICT: BLOCK` (with reasons). An inappropriate posture, restatement failure, presence of logical breakpoints, or a reason to enter that cannot be stated or holds only under several stacked preconditions must output `BLOCK`, which must be rejected back through the pipeline for revision, with zero exemptions.
 
 ### 5.3 Final Optional Step: Author Voice Rewrite (voice rewrite)
 

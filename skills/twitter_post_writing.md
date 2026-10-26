@@ -6,7 +6,7 @@
 - **适用场景**：从一篇已通过双重 gate 的文章生成 Twitter 导流文案（Typefully long post，中文）。发布动作本身（创建 draft、schedule）归发布层 skill，不在本文件内。
 - **上游**：`workflow_external_writing.md`（文章层工作流与 gate 哲学）。
 - **创建**：2026-08-21；2026-08-22 改版为"结构复用"路线（v2，见陷阱表最后两行：另起结构的两次实测失败）。
-- **执行者**：调用方 agent 编排；生成默认走 Antigravity CLI（独立上下文，Gemini 3.8 Flash High），机械检查走 lint CLI 与确定性命令。
+- **执行者**：调用方 agent 编排；生成默认走 Antigravity CLI（独立上下文，Gemini 4 Argon High），机械检查走 lint CLI 与确定性命令。
 - **最后更新**：2026-09-21
 
 ## 0. 核心原则：复用文章结构，只治文风
@@ -32,7 +32,7 @@
 
 ```bash
 agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write tweet_final.md." \
-  --model gemini-3.8-flash-high \
+  --model gemini-4-argon-high \
   --mode accept-edits \
   --sandbox \
   --dangerously-skip-permissions \

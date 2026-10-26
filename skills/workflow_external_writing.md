@@ -29,13 +29,13 @@ Main Agent 是编辑、事实负责人和最终验收者，但**不是 prose 判
 
 ### 1.1 执行载体与上下文隔离约束（Antigravity CLI）
 
-初稿生成、naturalize 重写、事实漂移核查与盲读/终端冷读默认通过 Antigravity + Gemini 3.8 Flash High 完成，所有 harness 一致。严禁在 Main Agent 同一 context 里局部修正几行冒充重写或冷读。
+初稿生成、naturalize 重写、事实漂移核查与盲读/终端冷读默认通过 Antigravity + Gemini 4 Argon High 完成，所有 harness 一致。严禁在 Main Agent 同一 context 里局部修正几行冒充重写或冷读。
 
 先读 ai-agent-cli 根 skill 与 Antigravity focused skill；通用 CLI 技术说明留在那里，本工作流只保留任务特定的调用、隔离与超时要求：
 
 ```bash
 agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and write the required output artifact." \
-  --model gemini-3.8-flash-high \
+  --model gemini-4-argon-high \
   --mode accept-edits \
   --sandbox \
   --dangerously-skip-permissions \
@@ -65,22 +65,21 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 ### 3.2 准备契约工件
 
 - **`source_contract.md`**：事实完整、不含推测。
-- **`writing_brief.md`**：reader start state / takeaway / 精确 thesis / H2 结构规划（4-6 个 `## H2`）/ 候选标题。
+- **`writing_brief.md`**：reader start state / 读者已有的关心与入口方案（见 §3.3）/ takeaway / 精确 thesis / H2 结构规划（4-6 个 `## H2`）/ 候选标题。
 - **`audience_contract.md`**：读者已知与禁止假设的未知概念、单一带走点。
 - **`voice_contract.md`**：目标 register 场景化描述（“坐在旁边”级别：平实具体不端着，短句落判断、长句连因果、段落有呼吸）；姿态范例；禁极性词与套路比喻。自指 before→after 样例不进 contract，由 Manager 在 naturalize 阶段从当次 draft 挑选（见 §4 阶段三）。
 - **`content_map.md`**：非线性证据卡片映射（`body-essential` / `appendix-only` / `omit`）。
 
 **来源链接纪律（硬要求）：** 调研得到的来源一律在正文就地嵌入（`[中文标签](url)`），供读者就地核查；不得只堆在文末参考资料、或只留在 scratchpad / search manifest。**不另设独立的参考资料来源章节。** 外部文章至少 3 个行内嵌入链接。
 
-### 3.3 开头纪律：标题与导语必须 earn the next
+### 3.3 开头纪律：先回答读者为什么要读
 
-标题与开头（H1 导语 + 第一个 H2）违反任一条即判不合格，回炉重跑：
+开头（标题、H1 导语与首个 H2）的首要任务是回答读者为什么想读；场景、抽象问题、领域观察都只是切入手段。开头的构思与正文成稿同等量级投入。违反任一条即判不合格，回炉重跑：
 
-1. **标题自明**：读者初见即懂在讲什么。必须有显式主语与张力，不出现无测量对象的数字、行话或自造词（自造词可放后半，前半须有主语与钩子）。
-2. **earn-the-next 规则**：导语和首个 H2 每句话都必须让读者建立正确预期或给出读下去的理由，否则删改。背景、融资、创始人经历不是理由。利益冲突披露须与数据可信度讨论同段呈现，成为论证的一部分，不置于文首。
-3. **setup before numbers**：数字首次出现前，必须先交代测量对象、测量者与测试 setting。未建上下文的纯数字是认知负债。
-
-检查方法：逐句通读导语与首个 H2，核对读者每句所获（认知预期/数据源/反直觉事实/自身关联）；写不出即为不合格。
+1. **入口接在读者已有的关心上**：`writing_brief.md` 写明读者是谁、他此刻已在关心什么（他自己的问题，不是我们的话题）、我们从哪一点接上；至少比较两个入口再选。**门槛测试**：列出读者须同时满足哪些前提才会被开头吸引（如「用过语音助手 × 了解其内部 × 对此好奇 × 关心推理基础设施」），超过两项即换入口。入口必须是正文兑现的东西，不得以诱饵换题。
+2. **标题自明**：读者初见即懂在讲什么。必须有显式主语与张力，不出现无测量对象的数字、行话或自造词（自造词可放后半，前半须有主语与钩子）。
+3. **earn-the-next 规则**：导语和首个 H2 每句话都必须让读者建立正确预期或给出读下去的理由，否则删改；逐句核对读者所获（认知预期/数据源/反直觉事实/自身关联），写不出即不合格。背景、融资、创始人经历不是理由。利益冲突披露须与数据可信度讨论同段呈现，成为论证的一部分，不置于文首。
+4. **setup before numbers**：数字首次出现前，必须先交代测量对象、测量者与测试 setting。未建上下文的纯数字是认知负债。
 
 ### 3.4 正文逻辑纪律：先讲为什么，伏笔必须回收（教材评审反馈，2026-10）
 
@@ -155,8 +154,8 @@ agy --print "Read /absolute/path/to/minimal-scratch/prompt.md; follow it and wri
 
 通过 Gate 1 后，另起全新独立 Antigravity CLI 会话（minimal scratch 仅含最终正文与极简评测 prompt，隔绝 brief、contract 与历史）：
 
-- **评测输出**：(1) 读者姿态体感（同行分享 vs 高高在上）；(2) 无术语复述测试（能否通俗复述每节）；(3) 逻辑断点（未介绍即评价、伏笔未收、话题跳跃、前后脱节）。
-- **硬阻断 Verdict**：必须以固定格式输出 `TERMINAL_VERDICT: SHIP` 或 `TERMINAL_VERDICT: BLOCK`（附原因）。姿态不当、复述失败或存逻辑断点即输出 `BLOCK`，必须打回管线修正，无豁免权。
+- **评测输出**：(1) 读者姿态体感（同行分享 vs 高高在上）；(2) 无术语复述测试（能否通俗复述每节）；(3) 逻辑断点（未介绍即评价、伏笔未收、话题跳跃、前后脱节）；(4) 入场理由（评测 prompt 只附一句目标读者身份、不含 thesis；冷读者只读标题和导语后，以该身份说出自己为什么会继续读）。
+- **硬阻断 Verdict**：必须以固定格式输出 `TERMINAL_VERDICT: SHIP` 或 `TERMINAL_VERDICT: BLOCK`（附原因）。姿态不当、复述失败、存逻辑断点，或说不出入场理由、理由要靠多重前提才成立，即输出 `BLOCK`，必须打回管线修正，无豁免权。
 
 ### 5.3 终局可选步骤：作者文风改写（voice rewrite）
 

@@ -76,6 +76,7 @@ BANNED_WORDS: tuple[str, ...] = (
     "结构性",
     "很稳",
     "更稳",
+    "卡点",
     # worn shorthand metaphors readers shouldn't be shown
     "尺子",
     # bare 值得 (after longer 值得* forms above)
