@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-10-26 (f)
+
+- Lint bans attribution hedges (按我们的理解、在我们的理解、我们的理解是、按我们的推断、在我们看来、我们认为、我们觉得) as HARD; new test. The research-memo pitfall entry (zh + en) now covers this form: the article is the author's view, judgments are stated directly, uncertainty is carried by content (what is unknown, how far evidence goes, conditionals), and checkers must not count removing these phrases as drift. Motivating feedback: the author asked why an article they wrote keeps saying "as we understand it", and whether it signals a lack of confidence.
+
 ### 2026-10-26 (e)
 
 - Cold read moves off Antigravity (Chinese canonical + English mirror): it is now run by a fresh-context sub-agent of the calling harness (Agent/Workflow in Claude Code, a subagent in OpenCode; the caller's main model, not necessarily Claude), never by the orchestrating main thread or pipeline agent. Run 3 times in parallel, median `REREAD_COUNT`, majority verdict. The prompt template now allows reading exactly one article file. Argon keeps drafting and rewriting. Calibration that motivated it: on a draft the author called unreadable (a three-layer definition paragraph), Gemini cold read gave REREAD 0 / SHIP; three fresh Claude sub-agents gave 22 / 13 / 20, all BLOCK, all naming the same paragraph plus two other issues the author would raise. Gemini on another candidate swung 19 / 2 / 18 across three runs.

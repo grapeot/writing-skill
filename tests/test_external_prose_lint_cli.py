@@ -207,6 +207,13 @@ def test_banned_standalone_ying_but_not_yingjian() -> None:
     assert by_id["banned_word"].count == 0
 
 
+def test_banned_attribution_hedges() -> None:
+    text = "按我们的理解，这是赌注。在我们看来它成立，我们认为也合理。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["banned_word"].count >= 3
+
+
 def test_polarity_catches_wubi() -> None:
     text = "信号已经无比明确，需要进一步验证。\n"
     report = cli.scan_text(text)
