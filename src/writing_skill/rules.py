@@ -79,6 +79,17 @@ BANNED_WORDS: tuple[str, ...] = (
     "卡点",
     # worn shorthand metaphors readers shouldn't be shown
     "尺子",
+    "撑破",
+    "撑不住",
+    "算账",
+    # attribution hedges: the article is the author's view; state judgments directly
+    "按我们的理解",
+    "在我们的理解",
+    "我们的理解是",
+    "按我们的推断",
+    "在我们看来",
+    "我们认为",
+    "我们觉得",
     # bare 值得 (after longer 值得* forms above)
     "值得",
     # scaffold phrases often left in body
@@ -137,8 +148,8 @@ RULES: dict[str, str] = {
         "external prose / COMMUNICATION / 晨报与 AGY writer 稳定禁词表："
         "空评价（值得*、意义重大）、战争/生长隐喻（击穿、打穿、拆解、长出来、生长、收口、闭眼编）、"
         "空架子名词（结构性、叙事弧线、奠定基础、赋能、范式转移、颠覆）、"
-        "套路比喻（尺子）、"
-        "口语表演（疯狂发版、一地鸡毛、很稳）、脚手架（这意味着、从这个角度看）。\n"
+        "套路比喻（尺子、撑破、撑不住、算账）、"
+        "口语表演（疯狂发版、一地鸡毛、很稳；单字「稳」作评价一律禁用，稳定、稳态、平稳除外；单字「硬」同理，硬件、硬盘、硬编码、硬币除外）、脚手架（这意味着、从这个角度看）、归属式限定（按我们的理解、在我们看来、我们认为、我们觉得：文章本来就是作者的观点，判断直接陈述，不确定性用内容交代）。\n"
         "→ 下列命中是否 AI 腔/空修辞？是则改成具体动作、事实或中性表述；"
         "若是不可替代的技术本义（如生物学「生长」），保留并在自查里写明理由。"
     ),
@@ -240,7 +251,15 @@ META_PREAMBLE_RE = re.compile(
 )
 NOT_X_BUT_Y_RE = re.compile(r"不是[^，。；\n]{0,20}，而是")
 WHEN_CLAUSE_RE = re.compile(r"当[^，。！？\n]{2,30}?[时候]|在[^，。！？\n]{2,30}?时候")
-BANNED_WORD_RE = re.compile("|".join(re.escape(w) for w in BANNED_WORDS))
+# 单字「稳」作评价用（做稳、求稳、稳住）一律禁用；「稳定」「稳态」「平稳」是正常词，放行。
+STANDALONE_WEN_PATTERN = r"(?<!平)稳(?![定态])"
+# 单字「硬」作评价用（硬理由、硬门槛、硬核）一律禁用；硬件、硬盘、硬编码、硬币是正常词，放行。
+STANDALONE_YING_PATTERN = r"硬(?![件盘编币])"
+BANNED_WORD_RE = re.compile(
+    "|".join(re.escape(w) for w in BANNED_WORDS)
+    + "|" + STANDALONE_WEN_PATTERN
+    + "|" + STANDALONE_YING_PATTERN
+)
 BEI_RE = re.compile(r"被[\u4e00-\u9fff]{1,12}")
 # 被动排比检测：排除「被动」这类元讨论，只看真正的「被」字标记。
 PASSIVE_TOKEN_RE = re.compile(r"被(?!动)")

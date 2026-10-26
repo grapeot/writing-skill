@@ -180,6 +180,40 @@ def test_banned_word_longest_match_and_list() -> None:
     assert "[值得]" in joined
 
 
+def test_banned_word_worn_metaphors() -> None:
+    for w in ("尺子", "撑破", "撑不住", "算账"):
+        assert w in cli.BANNED_WORDS
+    text = "语音最先把无状态请求撑破，旧做法撑不住，要算账才清楚。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["banned_word"].count >= 3
+
+
+def test_banned_standalone_wen_but_not_wending() -> None:
+    bad = cli.scan_text("结构化的工具调用更难做稳，只能求稳。\n")
+    by_id = {c.id: c for c in bad.checks}
+    assert by_id["banned_word"].count >= 2
+    ok = cli.scan_text("系统运行稳定，进入稳态后延迟平稳。\n")
+    by_id = {c.id: c for c in ok.checks}
+    assert by_id["banned_word"].count == 0
+
+
+def test_banned_standalone_ying_but_not_yingjian() -> None:
+    bad = cli.scan_text("这条线有硬理由，也有硬门槛。\n")
+    by_id = {c.id: c for c in bad.checks}
+    assert by_id["banned_word"].count >= 2
+    ok = cli.scan_text("软硬件一起升级，硬盘和硬编码的配置都要改。\n")
+    by_id = {c.id: c for c in ok.checks}
+    assert by_id["banned_word"].count == 0
+
+
+def test_banned_attribution_hedges() -> None:
+    text = "按我们的理解，这是赌注。在我们看来它成立，我们认为也合理。\n"
+    report = cli.scan_text(text)
+    by_id = {c.id: c for c in report.checks}
+    assert by_id["banned_word"].count >= 3
+
+
 def test_polarity_catches_wubi() -> None:
     text = "信号已经无比明确，需要进一步验证。\n"
     report = cli.scan_text(text)

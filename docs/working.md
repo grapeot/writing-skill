@@ -2,6 +2,34 @@
 
 ## Changelog
 
+### 2026-10-26 (g)
+
+- Cold read back to a single run (zh + en). The three-run median added in (e) was a response to Antigravity's variance; fresh-context harness sub-agents proved consistent across three runs on two drafts (22 / 13 / 20 and 10 / 11 / 11, all BLOCK, same sentences flagged), so the extra runs only cost time. Author's call after seeing the data.
+
+### 2026-10-26 (f)
+
+- Lint bans attribution hedges (按我们的理解、在我们的理解、我们的理解是、按我们的推断、在我们看来、我们认为、我们觉得) as HARD; new test. The research-memo pitfall entry (zh + en) now covers this form: the article is the author's view, judgments are stated directly, uncertainty is carried by content (what is unknown, how far evidence goes, conditionals), and checkers must not count removing these phrases as drift. Motivating feedback: the author asked why an article they wrote keeps saying "as we understand it", and whether it signals a lack of confidence.
+
+### 2026-10-26 (e)
+
+- Cold read moves off Antigravity (Chinese canonical + English mirror): it is now run by a fresh-context sub-agent of the calling harness (Agent/Workflow in Claude Code, a subagent in OpenCode; the caller's main model, not necessarily Claude), never by the orchestrating main thread or pipeline agent. Run 3 times in parallel, median `REREAD_COUNT`, majority verdict. The prompt template now allows reading exactly one article file. Argon keeps drafting and rewriting. Calibration that motivated it: on a draft the author called unreadable (a three-layer definition paragraph), Gemini cold read gave REREAD 0 / SHIP; three fresh Claude sub-agents gave 22 / 13 / 20, all BLOCK, all naming the same paragraph plus two other issues the author would raise. Gemini on another candidate swung 19 / 2 / 18 across three runs.
+- Fact check: give the checker the pre-voice version too and ask for paragraph-level comparison, because deletion-type drift (dropped identity gloss, softened qualifier) passed two independent checks and surfaced only in a cold read.
+- Two new known pitfalls record both failures.
+
+### 2026-10-26 (d)
+
+- Added a problem-driven skeleton rule to acceptance criterion 1 of the external-writing spine (Chinese canonical + English mirror): the H2 plan in `brief.md` must be written as reader questions or designer challenges, not object names; analyses of a system/product/decision follow "challenge → goals → decisions → what each buys and costs", with technical facts appearing as consequences of decisions. Checked by the main thread at the brief stage, not by the cold read (the cold read is already noisy, and a skeleton problem caught after drafting forces a full rewrite). Added a known-pitfall entry with the real example. Motivating session: an infra-strategy article that introduced the system's three layers and then walked through where each mattered; the author found it unreadable and asked for the designer's-seat framing (what challenge did the SGLang architect face, what did they need — organized, usable, stable, a good abstraction — and which decisions follow). The sister article showed the related failure: a 2×3 classification grid with two empty cells made the cold read oscillate across rounds.
+
+### 2026-10-26 (c)
+
+- 禁词表新增「撑破」「撑不住」「算账」：作者在一篇推理基础设施文章里逐句指出「实时语音是最先把无状态请求撑破的地方」「最先在实时语音里撑不住」「要算清这半句话的账」这类套路比喻（同类还有「对账规矩」），要求一律改成直白陈述。归入 `banned_word` HARD 项，与「尺子」同列「套路比喻」；新增 `test_banned_word_worn_metaphors`。同一轮作者又要求单字「稳」作评价一律禁用（「结构化的工具调用更难做稳」），「稳定」可以：在 `BANNED_WORD_RE` 末尾加 `(?<!平)稳(?![定态])`，放行稳定、稳态、平稳；新增 `test_banned_standalone_wen_but_not_wending`。随后又加单字「硬」（「这条线有硬理由」）：`硬(?![件盘编币])`，放行硬件、硬盘、硬编码、硬币；新增 `test_banned_standalone_ying_but_not_yingjian`。`tests/` 33 项通过。注：工作区 `rules/skills/external_prose_lint_cli.py` 是旧的单文件实现，禁词表早已与本包分叉（连「尺子」都没有），未同步；skill 现在的调用方式是本包的 `python -m writing_skill.external_prose_lint_cli`。
+
+### 2026-10-26 (b)
+
+- Rebuilt the external-writing spine around result certainty instead of process certainty (Chinese canonical + English mirror). Motivating session: a Chinese article passed every stage of the old five-stage pipeline (lint hard=0, terminal cold read SHIP) yet the author found it read like a status report to a boss, with long pre-noun modifiers and meta sentences ("this discussion was triggered by..."). Root causes: the cold reader was a highly capable model asked only whether it could restate the article, so it could never surface reading burden; the source contract's "keep every fact and qualifier" pressure pushed all qualifiers into single sentences; naturalize was capped at ±10% length and could not split or cut; post-voice lint was downgraded to report-only.
+- New spine: goal + five acceptance criteria judged on the final (post-voice) text: topic/thesis/information increment (including the same-day §3.3 entry rules: reader's existing concern, two entry options, threshold test), zero fact drift against source_contract, lint blocking with main-agent mechanical minimal fixes after voice, a cold read with a limited-attention reader persona (subway, phone, read once) that marks re-read points and judges tone, and voice rewrite completed. Only real ordering constraint kept: Argon draft → voice rewrite → fact check → lint and cold read on the final text. Removed naturalize stage, Gate staging, audience/voice/content-map contracts (merged into brief.md). Old §3.5 sentence-level table moved to `bestpractice_external_prose.md`. Known pitfalls rewritten from real 2026-10-25/26 failures, including concrete voice-rewrite drift cases.
+- Line budget: spine went from ~204 to ~146 lines.
+
 ### 2026-10-26
 
 - Rewrote §3.3 of the external-writing spine (Chinese canonical + English mirror) around one primary question: why would the reader want to read this. The opening's first job is now to connect to a concern the reader already holds; `writing_brief.md` must state the reader, their existing concern, and the connection point, and compare at least two entry options. Added a threshold test: list the preconditions a reader must meet at once to be drawn in; more than two means the entry is too narrow and must change. The entry must be delivered by the body (no bait). Gate 2 cold read gains a fourth check ("reason to enter", judged from headline + lead with a one-line reader identity) that can BLOCK. Motivating session: an infra-strategy article whose lead was a well-built voice-assistant interruption scene, yet it only worked for readers who use voice assistants, know their internals, care about them, and care about inference infrastructure; every existing gate passed it. One-in-one-out: merged the old "检查方法" paragraph into the earn-the-next item; the spine did not grow.
