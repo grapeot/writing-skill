@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-10-26
+
+- Rewrote §3.3 of the external-writing spine (Chinese canonical + English mirror) around one primary question: why would the reader want to read this. The opening's first job is now to connect to a concern the reader already holds; `writing_brief.md` must state the reader, their existing concern, and the connection point, and compare at least two entry options. Added a threshold test: list the preconditions a reader must meet at once to be drawn in; more than two means the entry is too narrow and must change. The entry must be delivered by the body (no bait). Gate 2 cold read gains a fourth check ("reason to enter", judged from headline + lead with a one-line reader identity) that can BLOCK. Motivating session: an infra-strategy article whose lead was a well-built voice-assistant interruption scene, yet it only worked for readers who use voice assistants, know their internals, care about them, and care about inference infrastructure; every existing gate passed it. One-in-one-out: merged the old "检查方法" paragraph into the earn-the-next item; the spine did not grow.
+
 ### 2026-10-25
 
 - 新增「被动语态排比（passive parallelism）」规则，来自作者明确反馈：中文不写「被 agent 调用、被 agent 组装、被 agent 运营」这类英文被动排比，读者要一直猜动作的主语。落点：`skills/bestpractice_external_prose.md` 诊断词条、`skills/workflow_external_writing.md` §3.5 句子层问题表与 §5.1 覆盖项、`skills/external_prose_lint.md` 规则表与说明段、`src/writing_skill/rules.py` 规则文案、`src/writing_skill/scanner.py` 的 `passive_parallelism` HARD 检查，以及 `tests/test_external_prose_lint_cli.py` 的三条测试（三条连排、顿号两项、主动句与单个被动不误报，且排除「被动语态」元讨论）。英文镜像同步。口径：单个「被」仍由 `bei_passive` 提示；连续 ≥3 个「被」或「被…、被…」才由本规则拦截。Line-budget rationale: §3.5 只新增一行表格、§5.1 在原有覆盖项内补一个短语，spine 净增 1 行，其余未动。
@@ -109,6 +113,8 @@
 ## Lessons Learned
 
 - A passive-voice rule that only says "avoid 被" will either over-block normal Chinese or miss the real translationese pattern. Split the two: keep single passives as a REVIEW hint, and make the HARD rule count chains (≥3 被, or a 被…、被… pair). The detector must also exclude meta-discussion like 「被动语态」, or the rule text flags itself.
+
+- An opening can pass every sentence-level gate (earn-the-next, setup before numbers, cold-read restatement) and still fail at its real job, because those gates check whether each sentence pays off for a reader who is already reading. They never ask whether the intended reader would start. Make the entry an explicit design choice in the brief (reader, their existing concern, connection point), count the stacked preconditions, and have the cold reader answer "why would I keep reading" in the target reader's shoes.
 
 - A visual style spec written as "default if no site spec" will be read as a suggestion. Make the default a hard gate, put the exact style keywords into the generation prompt, and verify the output mechanically (color count, edge hardness, shadows) before it enters the Markdown. If the constraint lives only in the workflow and not in the prompt, the image model's own aesthetic wins.
 
