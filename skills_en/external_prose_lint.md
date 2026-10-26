@@ -14,7 +14,7 @@ The lexicon and several regexes are tuned for **Chinese external prose** (the pr
 
 ## When to use
 
-- `workflow_external_writing.md` Section 5.1 Gate 1 (mechanical code linter), and the rerun after the Section 5.3 author-voice rewrite
+- `workflow_external_writing.md` acceptance criterion 3: blocking on the final text (after voice rewrite); the main agent makes mechanical minimal fixes for hard findings
 - After a writer/main-agent rewrite, before claiming mechanical hygiene is clean
 - When the user asks to self-check against external-facing style rules on programmable items
 
@@ -81,7 +81,7 @@ python -m pytest tests/test_external_prose_lint_cli.py -q
 
 - CLI: `src/writing_skill/external_prose_lint_cli.py`
 - Tests: `tests/test_external_prose_lint_cli.py`
-- Workflow hook: `skills/workflow_external_writing.md` Section 5.1 / 5.3
+- Workflow hook: `skills/workflow_external_writing.md` acceptance criterion 3
 
 ## English share and link discipline (added 2026-09-24)
 

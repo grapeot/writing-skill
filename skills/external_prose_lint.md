@@ -10,7 +10,7 @@
 
 ## 何时用
 
-- `workflow_external_writing.md` §5.1 Gate 1（机械代码校验器），以及 §5.3 作者文风改写之后的重跑
+- `workflow_external_writing.md` 验收标准第 3 条：在最终稿（voice rewrite 之后）上阻断，hard 项由主线程机械最小修正
 - Writer / Main Agent 改完稿后的机械卫生检查
 - 用户说「对照 external facing writing 自查」且问题落在可程序化项上
 
@@ -80,7 +80,7 @@ python -m pytest tests/test_external_prose_lint_cli.py -q
 
 - CLI：`src/writing_skill/external_prose_lint_cli.py`
 - 测试：`tests/test_external_prose_lint_cli.py`
-- 工作流接入：`skills/workflow_external_writing.md` §5.1 / §5.3
+- 工作流接入：`skills/workflow_external_writing.md` 验收标准第 3 条
 
 ## 英文占比与链接纪律（2026-09-24 新增）
 
