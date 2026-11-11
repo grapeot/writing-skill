@@ -138,7 +138,7 @@ The following are real failures that have occurred in practice:
 
 ## Illustrations
 
-Include 2-3 images for long articles (at least 1 for short articles under 2,000 characters), generated or redrawn with GPT Image (default `gpt-image-2.5-sunburst`), compressed to JPG/WebP with the long edge around 1024px and each file under 200KB, referenced via relative paths, with a complete claim sentence as the alt text.
+Include 2-3 images for long articles (at least 1 for short articles under 2,000 characters), generated or redrawn with GPT Image (default `gpt-image-2.6-sunburst`), compressed to JPG/WebP with the long edge around 1024px and each file under 200KB, referenced via relative paths, with a complete claim sentence as the alt text.
 
 ### Pre-Generation Decisions and Visual Spec
 
