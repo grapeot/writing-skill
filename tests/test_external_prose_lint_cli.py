@@ -181,12 +181,12 @@ def test_banned_word_longest_match_and_list() -> None:
 
 
 def test_banned_word_worn_metaphors() -> None:
-    for w in ("尺子", "撑破", "撑不住", "算账"):
+    for w in ("尺子", "撑破", "撑不住", "算账", "铁律"):
         assert w in cli.BANNED_WORDS
-    text = "语音最先把无状态请求撑破，旧做法撑不住，要算账才清楚。\n"
+    text = "语音最先把无状态请求撑破，旧做法撑不住，要算账才清楚，这也是行业铁律。\n"
     report = cli.scan_text(text)
     by_id = {c.id: c for c in report.checks}
-    assert by_id["banned_word"].count >= 3
+    assert by_id["banned_word"].count >= 4
 
 
 def test_banned_standalone_wen_but_not_wending() -> None:

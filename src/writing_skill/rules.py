@@ -77,11 +77,34 @@ BANNED_WORDS: tuple[str, ...] = (
     "很稳",
     "更稳",
     "卡点",
-    # worn shorthand metaphors readers shouldn't be shown
+    # worn shorthand metaphors & theatrical drama tropes readers shouldn't be shown
+    "撞上两堵墙",
+    "撞到两堵墙",
+    "两堵墙",
+    "沦为摆设",
+    "无人问津",
+    "僵尸项目",
+    "生死线",
+    "铁律",
+    "闹笑话",
+    "带进沟里",
+    "后背发凉",
     "尺子",
     "撑破",
     "撑不住",
     "算账",
+    "第一刀",
+    "第二刀",
+    "第三刀",
+    "这三刀",
+    "三刀",
+    "切一刀",
+    "三次切割",
+    # English "cannot stand / stand up to scrutiny" calques
+    "站不住脚",
+    "站得住脚",
+    "站不住",
+    "站得住",
     # attribution hedges: the article is the author's view; state judgments directly
     "按我们的理解",
     "在我们的理解",
@@ -243,7 +266,7 @@ EVAL_LABEL_RE = re.compile(r"很[\u4e00-\u9fff]{1,6}[：:]")
 POLARITY_RE = re.compile(
     r"这根本不是|根本不是|根本无法|绝不是|绝不意味着|绝不取决于|绝不|"
     r"绝对不是|绝对不能|死死锁|极其典型|极其|极致的|极端的|"
-    r"无比|残酷现实|印证了一个残酷"
+    r"无比|残酷|灾难来得|一场灾难"
 )
 META_PREAMBLE_RE = re.compile(
     r"具体来说|接下来我们看|接下来看|需要重点说明的是|需要指出的是|"

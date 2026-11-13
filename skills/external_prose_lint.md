@@ -43,11 +43,11 @@ python -m writing_skill.external_prose_lint_cli path/to/article.md --fail-on nev
 | `quotes` | `“”` `「」` `『』` ASCII `"` | REVIEW |
 | `bracket_gloss` | 中文（English）/ English（中文） | HARD |
 | `eval_label` | `很…：` | HARD |
-| `polarity` | 根本/绝不/极其/残酷现实… | HARD |
+| `polarity` | 根本/绝不/极其/残酷/灾难… | HARD |
 | `meta_preamble` | 具体来说/接下来我们看… | HARD |
 | `not_x_but_y` | 不是…，而是… | HARD |
 | `when_clause` | 当…时 / 在…的时候 翻译腔从句 | HARD |
-| `banned_word` | 稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线/奠定基础…） | HARD |
+| `banned_word` | 稳定禁词表（长出来/结构性/拆解/值得*/击穿/赋能/叙事弧线/奠定基础/三刀/第一刀/三次切割/站不住/站得住/撞上两堵墙/两堵墙/沦为摆设/无人问津/僵尸项目/生死线/铁律…） | HARD |
 | `single_sentence_paragraph` | 汉字≥20 的单句自然段 | REVIEW |
 | `english_density` | 单个 prose 段落英文词 >20（链接 URL 不计） | REVIEW |
 | `repeated_url` | 同一 URL 全文出现 >2 次（同一来源只在首次出现给嵌入链接，文末不设来源清单） | REVIEW |
@@ -109,7 +109,7 @@ stats 新增 `english_words`（正文英文词总数，链接不计），用于�
 
 输出除命中段落外，还给出全文数字总量 `numbers_total` 与每千汉字数字密度 `numbers_per_1000_cjk`（stats + header 行），供 CI 与跨稿对比观察。
 
-触发后的默认改法是**着眼 high-level intuition，不过分强调技术细节**：
+触发后的默认改法是**着眼 high-level intuition，不过分强调技术细节**（**严禁为了绕开正则检测而把阿拉伯数字改写成中文汉字，如把 `2018`、`185`、`130 万` 写成 `二零一八`、`一百八十五`、`一百三十万`；年份、日期与具体统计数值必须保持阿拉伯数字**）：
 1. 一段只保留 1-2 个承担因果或对比直觉的数字；判断标准：删掉这个数字后，段落的判断是否依然成立。
 2. 次要数字三选一：归组配因果（「几家旗舰挤在 30 分上下：A 36.4、B 36.8」）；降级为约数（「8×H100 跑 8 小时」→「几块卡跑一晚」）；移入表格或材料清单。
 3. 确为逐项核对所需（账单明细、对照实验结果表）时保留，并在自查里写明理由。
