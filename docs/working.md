@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-11-14
+
+- Updated pixel-tier illustration acceptance check step 1 and added a known-pitfall entry in `skills/workflow_external_writing.md` (and `skills_en/workflow_external_writing.md`): forbid Pillow's default `Image.Quantize.MEDIANCUT` when quantizing GPT Image outputs to 8-16 colors, require nearest-color snapping in RGB space to an explicit semantic palette (base semantic colors plus 1-2 lightness steps = 10-14 colors), and visually verify that blue (`#6B7FE8`), amber (`#E8A33D`), and red (`#C6574A`) accents remain distinct after quantization. Motivating failure: because the cream background (`#F6F2E7`) occupies >80% of the pixel area, `MEDIANCUT` allocated 7 of 10 palette bins to shades of beige and gray, washing out all minority accents in one illustration into gray-white and merging red and amber borders in another into muddy brown. One-in-one-out: merged the two adjacent voice-rewrite pitfall bullets so the spine stays at 166 lines (0 net line growth).
+
 ### 2026-10-26 (g)
 
 - Cold read back to a single run (zh + en). The three-run median added in (e) was a response to Antigravity's variance; fresh-context harness sub-agents proved consistent across three runs on two drafts (22 / 13 / 20 and 10 / 11 / 11, all BLOCK, same sentences flagged), so the extra runs only cost time. Author's call after seeing the data.
@@ -139,6 +143,8 @@
 - Prepared for privacy review, GitHub repo creation, and migration of the two context-infrastructure repos.
 
 ## Lessons Learned
+
+- Area-weighted color quantization (`Pillow`'s default `Image.Quantize.MEDIANCUT`) fails on sparse technical diagrams with a dominant background (>80% cream `#F6F2E7`): it spends almost the entire palette budget on slight background variations and wipes out minority semantic accents (`#6B7FE8`, `#E8A33D`, `#C6574A`). Always quantize pixel-tier illustrations by snapping pixels in RGB space to an explicit semantic palette and visually verify that semantic accent hues survive quantization.
 
 - A passive-voice rule that only says "avoid 被" will either over-block normal Chinese or miss the real translationese pattern. Split the two: keep single passives as a REVIEW hint, and make the HARD rule count chains (≥3 被, or a 被…、被… pair). The detector must also exclude meta-discussion like 「被动语态」, or the rule text flags itself.
 
