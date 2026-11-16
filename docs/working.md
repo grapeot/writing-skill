@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-11-16
+
+- Clarified host-aware Argon invocation and independent verification boundaries in `skills/workflow_external_writing.md` and `skills_en/workflow_external_writing.md`: `agy --print` is a bridge for non-Argon hosts (such as Claude Code and OpenCode) to reach Gemini Argon; when the primary session is already running inside Antigravity (Gemini Argon), the main thread drafts and revises prose directly (or via a sub-agent) and must not make nested `agy --print` CLI calls. Even when the main thread writes the prose itself, acceptance gates — independent fact checking, the limited-attention reader cold read, and Semantic Prose Linter (when configured) — must still run in fresh-context sub-agents that did not participate in drafting, with `external_prose_lint_cli` mandatory as usual. Rewrote existing role, resource, failure-repair, and acceptance bullets in place (0 net line growth).
+
 ### 2026-11-14
 
 - Updated pixel-tier illustration acceptance check step 1 and added a known-pitfall entry in `skills/workflow_external_writing.md` (and `skills_en/workflow_external_writing.md`): forbid Pillow's default `Image.Quantize.MEDIANCUT` when quantizing GPT Image outputs to 8-16 colors, require nearest-color snapping in RGB space to an explicit semantic palette (base semantic colors plus 1-2 lightness steps = 10-14 colors), and visually verify that blue (`#6B7FE8`), amber (`#E8A33D`), and red (`#C6574A`) accents remain distinct after quantization. Motivating failure: because the cream background (`#F6F2E7`) occupies >80% of the pixel area, `MEDIANCUT` allocated 7 of 10 palette bins to shades of beige and gray, washing out all minority accents in one illustration into gray-white and merging red and amber borders in another into muddy brown. One-in-one-out: merged the two adjacent voice-rewrite pitfall bullets so the spine stays at 166 lines (0 net line growth).
@@ -143,6 +147,8 @@
 - Prepared for privacy review, GitHub repo creation, and migration of the two context-infrastructure repos.
 
 ## Lessons Learned
+
+- Rules that prescribe a CLI bridge (`agy --print`) to reach a specific model must distinguish the target model from the transport: when the calling session already runs inside that target host/model (Antigravity / Gemini Argon), nested CLI invocations add overhead and failure modes without changing the writer model, whereas verification gates (fact check, cold read, semantic prose lint) still require fresh-context sub-agents so the writer never grades its own draft.
 
 - Area-weighted color quantization (`Pillow`'s default `Image.Quantize.MEDIANCUT`) fails on sparse technical diagrams with a dominant background (>80% cream `#F6F2E7`): it spends almost the entire palette budget on slight background variations and wipes out minority semantic accents (`#6B7FE8`, `#E8A33D`, `#C6574A`). Always quantize pixel-tier illustrations by snapping pixels in RGB space to an explicit semantic palette and visually verify that semantic accent hues survive quantization.
 

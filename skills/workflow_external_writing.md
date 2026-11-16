@@ -6,7 +6,7 @@
 - **适用场景**：把已经核实过的调研成果，转成面向读者的中文分析文章或公开报告
 - **前置依赖**：`workflow_deep_research_survey.md` Phase 1-3 或等价的已核实事实底稿
 - **关联 Skill**：`antigravity_cli.md`、voice-lora rewrite skill、`external_prose_lint.md`、`bestpractice_external_prose.md`、GPT Image 生成 skill
-- **最后更新**：2026-11-14
+- **最后更新**：2026-11-16
 
 ## 目标
 
@@ -24,7 +24,7 @@
     - 标题自明，读者初看即知主语和讨论的问题；导语每句话都给读者继续读下去的理由；数字首次出现前先交代测量对象。
     - 骨架问题驱动，不按清单罗列：`brief.md` 的 H2 规划写成读者会问的问题或设计者要回答的挑战，不写成对象名。分析一个系统、产品或技术决策时，按「遇到什么挑战 → 要达到什么目标 → 做了什么决定 → 每个决定换来什么、付出什么」组织；技术事实作为决定的后果出场，不先列组件再讲各自在哪有用。主线程在把 brief 交给 Argon 之前按这条检查骨架。
 2. **事实零漂移**
-    - 用独立上下文对照 `source_contract.md` 逐条核查最终稿（即 voice rewrite 之后的文本）。
+    - 由未参与起草的 fresh-context sub-agent 对照 `source_contract.md` 逐条核查最终稿（即 voice rewrite 之后的文本）；即使主线程亲自起草也不能自审。
     - 数字、日期、归属、方向、判断强度、新增或遗漏事实的漂移数为 0。只验收最终文本。
     - 主线程逐条裁定核查结果。独立核查员常把 `brief.md` 有意集中到一段的限定说明报成「限定被删掉」，并建议把限定挂回每句；按 brief 的设计判定这类不是漂移，否则会把调研 memo 写法带回正文。
     - 重写时引入了解释性常识或新的来源事实，先补进 `source_contract.md` 再送核查，否则核查员会把它们报成新增事实。
@@ -37,7 +37,7 @@
    - 最终稿需满足 `hard_findings=0` 且退出码为 `0`，提交时附 stdout 全文。
    - voice rewrite 后若仍有 hard findings，由主线程进行最小机械修正（改标点、禁词替换、拆 `当……时`），不改其余文字；无法机械修正的段落重新 run voice rewrite。
 4. **独立冷读通过**
-   - 由调用方 harness 新开 fresh-context sub-agent 执行（Claude Code 用 Agent/Workflow，OpenCode 用其 subagent；模型就用调用方的主力模型，不必是 Claude），不用 Antigravity，也不能由编排流程的主线程或管线 agent 自己读。sub-agent 只拿到最终正文（内联或唯一的文件路径）和下面固定的评测 prompt，不给 `brief.md`、`source_contract.md` 或历史对话。Argon 负责写，评测换成逻辑更强、没见过任何上下文的读者。
+   - 由调用方 harness 新开未参与起草的 fresh-context sub-agent 执行（Claude Code 用 Agent/Workflow，OpenCode 或 Antigravity 用原生 sub-agent；不调用 `agy --print` CLI，也不能由起草或编排流程的主线程/管线 agent 自己读）。sub-agent 只拿到最终正文（内联或唯一的文件路径）和下面固定的评测 prompt，不给 `brief.md`、`source_contract.md` 或历史对话。
    - 冷读跑一次即可。早先观察到的大幅波动（同一稿 19 / 2 / 18）来自 Antigravity；换成 fresh-context sub-agent 后，同一稿三次判定一致（22 / 13 / 20 全 BLOCK，10 / 11 / 11 全 BLOCK），且点中的是同一批句子，不需要多跑取中位数。
    - 最后一行必须是 `TERMINAL_VERDICT: SHIP`。如果每千字回读点超过 1 处、口吻像汇报/研究报告/说教、复述不出 thesis、有逻辑断点、说不出进入理由或进入理由要叠加多个前提才成立，则判 `BLOCK`。
    - 回读密度由主线程机械计算：`REREAD_COUNT` 除以正文汉字数（千字）。评测模型给出 `SHIP` 但计算结果超过每千字 1 处时，按 `BLOCK` 处理，不采信 verdict 行。
@@ -69,7 +69,7 @@
 当验收不通过时，我们在最低层进行修复：
 - **事实漂移**：主线程进行手术式修正，仅改动事实点，保留 voice rewrite 后的措辞，并逐条记录 `原句 → 修正`。
 - **lint hard 命中**：主线程进行机械最小修正，或者对该段单独重跑 voice rewrite。
-- **冷读 BLOCK（负担、口吻、逻辑）**：将冷读意见和对应段落交给新的 Argon 会话重写该节，然后对重写部分重新跑 voice rewrite、核事实和重跑 lint 及冷读。主线程不自己改写句子。
+- **冷读 BLOCK（负担、口吻、逻辑）**：将冷读意见和对应段落交给 Argon 重写该节（非 Argon 宿主开新的 `agy --print` 会话，主线程不自己改写句子；宿主本身已是 Antigravity 时由主线程或 sub-agent 直接重写，禁止套娃调 `agy --print`），然后对重写部分重新跑 voice rewrite、核事实和重跑 lint 及冷读。
   - 冷读点名的是具体句子时，给段落编号，让 Argon 只重写被点名的段落，未点名段落一字不动。
   - 只把实质性重写的段落送 voice rewrite；只删改一两句的段落直接用 Argon 输出。已经过 voice 的文字不再送 voice，按段落序号拼回全文。
   - 第一轮 BLOCK 是常态，不必推倒重来。实测按这个办法局部重写两轮，回读点从 10 处降到 5 处再到 1 处。
@@ -78,17 +78,17 @@
 
 ## 角色边界
 
-- **主线程**：编辑/事实负责人。负责确定thesis、准备`source_contract.md`和`brief.md`、核查事实、做lint的机械最小修正、裁定是否交付。主线程不自己写正文，也不按个人语感回改voice rewrite输出的文风。
+- **主线程**：编辑/事实负责人。负责确定 thesis、准备 `source_contract.md` 和 `brief.md`、裁定事实核查与收回漂移、做 lint 的机械最小修正、决定是否交付。非 Argon 宿主的主线程不自己写正文；任何宿主下主线程都不按个人语感回改 voice rewrite 输出的文风，也不能自己充当验收裁判。
   - 写 `brief.md` 时和交付前，主线程以目标读者身份回答三个问题：为什么会点进来，读到哪里会停下，读完带走什么。答不上来就回到选题和入口，不进入起草或交付。这一步只用来在跑 gate 之前拦住选题与入口问题，不替代冷读，也不算主线程自评通过。只核对流程是否齐全而不以读者身份读文章，框架问题会一直漏到最后。
-- **Argon (`gemini-4-argon-high`)**：负责起草正文，以及按冷读意见重写未通过的章节。
-- **voice rewrite**：负责文风改写，减少AI文风。
-- **lint与冷读评测者**：负责在最终稿上做结果判定。冷读者是调用方 harness 的 fresh-context sub-agent，不是 Argon。
+- **Argon（`gemini-4-argon-high`）**：负责起草正文，以及按冷读意见重写未通过的章节。本工作流默认走 Antigravity CLI（`agy --print --model gemini-4-argon-high`）是因为在 Claude Code、OpenCode 等非 Argon 宿主中需要借道调用 Argon；**如果当前主会话本身就运行在 Antigravity（底层模型即 Gemini Argon）中，主线程可直接起草和修改正文（也可按需用 sub-agent 起草），不要再套娃调用 `agy --print` CLI。**
+- **voice rewrite**：负责文风改写，减少 AI 文风。
+- **独立验收者与机械校验**：即使主线程亲自起草或改写了正文，也不能自己充当裁判。最终稿的独立事实核查、有限注意力读者冷读（Cold Read），以及语义级文风扫描（Semantic Prose Linter，若工作区已配置）等校验步骤，**依然必须新开未参与起草的 fresh-context sub-agent 独立执行**；确定性机械校验 `external_prose_lint_cli` 同样照常必跑。
 
 ## 可用资源与工件
 
 ### 可用资源
 
-- **Antigravity CLI**：调用前阅读 Antigravity CLI 的 skill（通用调用、隔离、超时规则）。本任务固定使用`--model gemini-4-argon-high`、`--mode plan`、材料直接内联到 prompt、不显式出现路径、`--print-timeout 12m`、`--output-format json`，从 stdout JSON 的`response`字段提取结果。
+- **Antigravity CLI（仅非 Argon 宿主使用）**：主会话本身已在 Antigravity（Gemini Argon）中运行时直接写或用 sub-agent 写，禁止套娃调用 `agy --print`。在 Claude Code、OpenCode 等非 Argon 宿主中调用前阅读 Antigravity CLI 的 skill（通用调用、隔离、超时规则），固定使用 `--model gemini-4-argon-high`、`--mode plan`、材料直接内联到 prompt、不显式出现路径、`--print-timeout 12m`、`--output-format json`，从 stdout JSON 的 `response` 字段提取结果。
 - **voice rewrite**：voice-lora 的 rewrite skill（公开仓库 `grapeot/voice-lora`；本机服务、命令和已知漂移类型见工作区 overlay）。
 - **机械校验（lint）**：`external_prose_lint.md`。
 - **诊断词汇**：`bestpractice_external_prose.md`（仅供主线程查阅，不进 Argon prompt）。
@@ -127,7 +127,7 @@
 - **按 what 罗列写成说明书（2026-10-26）**：先介绍系统有哪几层、哪些组件（「阶段层负责……；会话层……；连接图描述……」），再逐个讲在什么场景下有用。读者被迫先记一串名词，不知道为什么要记，作者评价「看不懂，cognitive burden 太高」。改成站在设计者位置：先讲挑战和目标，再讲由此推出的决定，组件名能删就删。同类问题：先立一个分类框架再往里填内容，框架本身的空格和命名冲突会让冷读来回振荡。
 - **调研memo写法带进正文（2026-10-26）**：把事实/推断/未知标签和全部限定条件塞进同一句，会产生长定语和汇报口吻。同一根源的另一种形态是归属式限定：为了给推断「标口吻」，满篇「按我们的理解」「在我们看来」「我们认为」，作者问「整篇都是我们写的，为什么老要强调，是不自信吗」。文章本来就是作者的观点，判断直接陈述；需要区分事实和推断时，写清楚不知道什么、证据到哪一步，或用条件句。核查员不应把删掉这类限定报成漂移，lint 已把这些短语列为禁词。
 - **出现交代工作过程的meta句（2026-10-26）**：比如`本次讨论由 2026 年 10 月 16 日生效的新版隐私政策触发`、`在查看……后发现`，读者不需要知道作者的工作过程。
-- **主线程自己重写正文（2026-10-26）**：主线程按作者的反馈直接重写中文正文，作者评价很差，最终放弃。正文必须由Argon来起草和重写。
+- **非 Argon 主线程自己重写正文（2026-10-26）**：非 Argon 宿主的主线程按作者反馈直接重写中文正文，作者评价很差，最终放弃。正文必须由 Argon 起草和重写（非 Argon 宿主走 `agy --print`，Antigravity 宿主直接写，不套娃调 CLI）。
 - **voice rewrite事实漂移与带回禁词（2026-10-26）**：曾经把迁移方向写反了（`AI Mode的格式可能会迁移到Gemini` 变成 `Gemini的东西挪到搜索`），`先后上线` 变`同时上线`，3月的`当时` 变`目前`，`可以用来` 变`也会被用来`，`目前不用于` 变`将不会被用于`，`高亮回答` 变`加粗答案`，截断链接锚文本（更早的实例见工作区的 voice rewrite overlay）；还会把句子改长并加回`这意味着`、`很稳`等禁词和破折号，所以lint和冷读必须在voice之后的最终稿上跑。
 - **Pillow 默认 MEDIANCUT 量化抹掉配图语义色（2026-11-14）**：把 GPT Image 原图压成 8-16 色像素图时用 Pillow 默认 `Image.Quantize.MEDIANCUT`，因奶油底 `#F6F2E7` 占画面 >80% 像素面积，算法把 10 个颜色名额里的 7 个分给不同深浅的米色和灰色，导致小面积的结构蓝 `#6B7FE8`、价值琥珀 `#E8A33D`、负信号红 `#C6574A` 被抹成灰白或合并成土黄色。必须按 RGB 距离吸附到显式语义调色板（主色加 1-2 档明度阶梯共 10-14 色），压图后目视核验语义色未丢失。
 - **thesis和近期文章重复（2026-10-25）**：同样的论点半年内写了三次，读者疲劳。
