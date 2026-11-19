@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 2026-11-18
+
+- Switched active drafting, rewriting, Twitter copy, and diagnostic prompt references to Gemini 4 Neon High in the root router and Chinese/English skills. Kept dated Argon observations as historical evidence rather than relabeling them as Neon results. Replaced the exclusive prose-quality assertion with a model-selection rule; independent fact checks, voice rewrite, lint, and cold-read acceptance remain required. Verified `gemini-4-neon-high` with Antigravity CLI 1.5.12: one isolated text-only call exited 0, returned `SUCCESS`, and retained the supplied facts. This was an availability check, not a comparative quality benchmark; the external spines have no net line growth.
+
 ### 2026-11-16
 
 - Clarified host-aware Argon invocation and independent verification boundaries in `skills/workflow_external_writing.md` and `skills_en/workflow_external_writing.md`: `agy --print` is a bridge for non-Argon hosts (such as Claude Code and OpenCode) to reach Gemini Argon; when the primary session is already running inside Antigravity (Gemini Argon), the main thread drafts and revises prose directly (or via a sub-agent) and must not make nested `agy --print` CLI calls. Even when the main thread writes the prose itself, acceptance gates — independent fact checking, the limited-attention reader cold read, and Semantic Prose Linter (when configured) — must still run in fresh-context sub-agents that did not participate in drafting, with `external_prose_lint_cli` mandatory as usual. Rewrote existing role, resource, failure-repair, and acceptance bullets in place (0 net line growth).

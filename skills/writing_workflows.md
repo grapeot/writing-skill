@@ -14,7 +14,7 @@ Two writing workflows, one shared diagnostic vocabulary, and one deterministic l
 
 1. **Internal writing** (`workflow_internal_writing.md`) — for readers who already share the project context (the author, collaborators, AI agents, project workflows). The goal is decision friction reduction: maximize actionable judgment per unit of attention. Core technique: bottom-line-up-front, concept ordering (action → difference → impact → name), skimmability, verifiability, adaptive reading paths.
 
-2. **External writing** (`workflow_external_writing.md`) — for readers who lack shared context (the public, clients, course audiences). The goal is a finished analytical article that reads like a practitioner sharing a finding, not a lecturer walking a student through a syllabus. Core technique: result certainty. The spine defines the goal and five acceptance criteria judged on the final text (thesis and information increment, zero fact drift against the source contract, blocking prose lint, a limited-attention cold read that marks re-read points and judges tone, and a completed author-voice rewrite); the only fixed order is Argon draft → voice rewrite → fact check → lint and cold read on the final text.
+2. **External writing** (`workflow_external_writing.md`) — for readers who lack shared context (the public, clients, course audiences). The goal is a finished analytical article that reads like a practitioner sharing a finding, not a lecturer walking a student through a syllabus. Core technique: result certainty. The spine defines the goal and five acceptance criteria judged on the final text (thesis and information increment, zero fact drift against the source contract, blocking prose lint, a limited-attention cold read that marks re-read points and judges tone, and a completed author-voice rewrite); the only fixed order is Neon draft → voice rewrite → fact check → lint and cold read on the final text.
 
 3. **Twitter post writing** (`twitter_post_writing.md`) — channel sub-workflow of external writing: turn a finished article into a distribution tweet (Typefully long post) without inheriting the article's aphorism layer or collapsing into a template. Core technique: single isolated Antigravity generation retelling the article in section order (~400 characters) with built-in voice constraints, lint-subset plus tweet-specific mechanical gates, and a fact-fidelity check against the article.
 
@@ -44,7 +44,7 @@ Before drafting, classify the audience:
 
 ## The CLI
 
-Prose generation, rewrites, QA, and cold reads default to Antigravity + Gemini 4 Argon High across all harnesses. Read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md) for the shared CLI contract; task-specific invocation, session isolation, and timeouts remain in the focused writing workflows.
+Prose generation and rewrites default to Antigravity + Gemini 4 Neon High across all harnesses. Read the [ai-agent-cli root skill](../../ai_agent_cli_skill/skills/skill_ai_agent_cli.md) and [Antigravity focused skill](../../ai_agent_cli_skill/skills/antigravity_cli.md) for the shared CLI contract; task-specific invocation, independent review and cold-read routing, session isolation, and timeouts remain in the focused writing workflows.
 
 A deterministic scanner for external-facing Chinese Markdown. Counts em dashes, quotes, bracket glosses, polarity words, banned lexicon, single-sentence paragraphs, bare URLs, English density, repeated URLs, domain-shaped anchors, H2 count, title book marks, bei-passive candidates, and char count. Each finding attaches the matching skill rule as a review question. The CLI does not judge taste.
 
@@ -62,7 +62,7 @@ The CLI is a hygiene floor, not a gate. A natural-language "scanned it, looks fi
 
 ## Honest limitations
 
-- The external writing workflow requires independent Antigravity CLI sessions and access to `gemini-4-argon-high`. Cold reads cannot see contracts, briefs, or global writing rules; execution and input boundaries are specified in the focused workflow. This repo does not provision model access.
+- The external writing workflow requires access to `gemini-4-neon-high`; non-Neon hosts reach it through independent Antigravity CLI sessions. Cold reads cannot see contracts, briefs, or global writing rules; execution and input boundaries are specified in the focused workflow. This repo does not provision model access.
 - The lint CLI is Chinese-primary. It still reports shared mechanical signals (em dashes, bare URLs, link counts) on mixed-language drafts, but its banned lexicon and polarity patterns are Chinese.
 - The internal writing workflow assumes the reader knows the project but not the new concepts introduced this round. It does not assume the reader knows nothing — if the reader is fully external, use the external workflow instead.
 

@@ -102,7 +102,7 @@ Treat the two axes the user raises repeatedly — **textbook voice, cognitive lo
 
 ## Common Chinese sentence-level problems (textbook review feedback, 2026-10)
 
-Sentence-level problems that lint cannot fully catch but that read awkwardly in Chinese. Moved here from the old sentence-level section of `workflow_external_writing.md`. The main agent may pick 1-3 entries relevant to the current draft and turn them into before→after examples in the Argon prompt; do not paste the whole table into the prompt. Examples stay in Chinese because the phenomena are Chinese-specific.
+Sentence-level problems that lint cannot fully catch but that read awkwardly in Chinese. Moved here from the old sentence-level section of `workflow_external_writing.md`. The main agent may pick 1-3 entries relevant to the current draft and turn them into before→after examples in the Neon prompt; do not paste the whole table into the prompt. Examples stay in Chinese because the phenomena are Chinese-specific.
 
 | 病 | 原句（真实样例） | 改法 |
 |---|---|---|
