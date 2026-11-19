@@ -104,7 +104,7 @@ Main Agent 的三件事：诊断姿态与架构（为什么端着 / 像讲义 / 
 
 ## 中文句子层常见病（教材评审反馈，2026-10）
 
-这些是 lint 抓不全、但读来别扭的句子层问题，原在 `workflow_external_writing.md` 的写作纪律里。主线程可以从中挑 1-3 条和当次稿子相关的，改成 before→after 样例放进给 Argon 的 prompt；不要整表塞进 prompt。
+这些是 lint 抓不全、但读来别扭的句子层问题，原在 `workflow_external_writing.md` 的写作纪律里。主线程可以从中挑 1-3 条和当次稿子相关的，改成 before→after 样例放进给 Neon 的 prompt；不要整表塞进 prompt。
 
 | 病 | 原句（真实样例） | 改法 |
 |---|---|---|
